@@ -1,0 +1,94 @@
+# depslib dependency file v1.0
+1521690005 source:c:\users\jacob\desktop\raytracing\algebra3.cpp
+	<math.h>
+	"algebra3.h"
+	<ctype.h>
+
+1521685014 c:\users\jacob\desktop\raytracing\algebra3.h
+	<algorithm>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+
+1521617282 source:c:\users\jacob\desktop\raytracing\object.cpp
+	"algebra3.h"
+	"Object.h"
+	<stdio.h>
+
+1521682323 c:\users\jacob\desktop\raytracing\object.h
+	"algebra3.h"
+	<vector>
+	<iostream>
+
+1521625352 source:c:\users\jacob\desktop\raytracing\main.cpp
+	"algebra3.h"
+	"Object.h"
+	"IO.h"
+	"RayProcess.h"
+
+1521630666 c:\users\jacob\desktop\raytracing\io.h
+	"Object.h"
+	<stdio.h>
+	<stdlib.h>
+	<assert.h>
+
+1521630666 source:c:\users\jacob\desktop\raytracing\io.cpp
+	"IO.h"
+	<stdio.h>
+
+1521625368 c:\users\jacob\desktop\raytracing\rayprocess.h
+	"Object.h"
+	"IO.h"
+
+1521689367 source:c:\users\jacob\desktop\raytracing\rayprocess.cpp
+	"RayProcess.h"
+	<algorithm>
+	<math.h>
+
+1521715587 source:c:\users\cglab\desktop\ray-tracing\algebra3.cpp
+	<math.h>
+	"algebra3.h"
+	<ctype.h>
+
+1521685016 c:\users\cglab\desktop\ray-tracing\algebra3.h
+	<algorithm>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+
+1523183984 source:c:\users\cglab\desktop\ray-tracing\io.cpp
+	"IO.h"
+	<stdio.h>
+
+1521630666 c:\users\cglab\desktop\ray-tracing\io.h
+	"Object.h"
+	<stdio.h>
+	<stdlib.h>
+	<assert.h>
+
+1523183984 c:\users\cglab\desktop\ray-tracing\object.h
+	"algebra3.h"
+	<vector>
+	<iostream>
+
+1523183983 source:c:\users\cglab\desktop\ray-tracing\main.cpp
+	"algebra3.h"
+	"Object.h"
+	"IO.h"
+	"RayProcess.h"
+	<time.h>
+
+1523184039 c:\users\cglab\desktop\ray-tracing\rayprocess.h
+	"Object.h"
+	"IO.h"
+
+1521617282 source:c:\users\cglab\desktop\ray-tracing\object.cpp
+	"algebra3.h"
+	"Object.h"
+	<stdio.h>
+
+1523261060 source:c:\users\cglab\desktop\ray-tracing\rayprocess.cpp
+	"RayProcess.h"
+	<algorithm>
+	<math.h>
+
