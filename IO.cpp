@@ -43,14 +43,15 @@ void ReadFile(Info &detail,const char fileName[])
         }
         case 'T':
         {
-            vec3 vertex[3];
-            for(int i=0; i<3; ++i)
+            vec3 vertex[4];
+            for(int i=0; i<4; ++i)
                 for(int j=0; j<3; ++j)
                     fscanf(fp,"%f",&vertex[i][j]);
             Triangle t;
             t.origin = vertex[0];
             t.v1 = vertex[1] - t.origin;
             t.v2 = vertex[2] - t.origin;
+            t.n  = vertex[3],t.n.normalize();
             t.mtr = m;
             detail.tri.push_back(t);
             break;
