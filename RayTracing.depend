@@ -45,7 +45,7 @@
 	<algorithm>
 	<math.h>
 
-1521715587 source:c:\users\cglab\desktop\ray-tracing\algebra3.cpp
+1524198487 source:c:\users\cglab\desktop\ray-tracing\algebra3.cpp
 	<math.h>
 	"algebra3.h"
 	<ctype.h>
@@ -56,7 +56,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1523183984 source:c:\users\cglab\desktop\ray-tracing\io.cpp
+1525270919 source:c:\users\cglab\desktop\ray-tracing\io.cpp
 	"IO.h"
 	<stdio.h>
 
@@ -66,19 +66,21 @@
 	<stdlib.h>
 	<assert.h>
 
-1523183984 c:\users\cglab\desktop\ray-tracing\object.h
+1525270919 c:\users\cglab\desktop\ray-tracing\object.h
 	"algebra3.h"
 	<vector>
 	<iostream>
 
-1523183983 source:c:\users\cglab\desktop\ray-tracing\main.cpp
+1525489095 source:c:\users\cglab\desktop\ray-tracing\main.cpp
 	"algebra3.h"
 	"Object.h"
 	"IO.h"
 	"RayProcess.h"
+	"KDTree.h"
 	<time.h>
 
-1523184039 c:\users\cglab\desktop\ray-tracing\rayprocess.h
+1525439879 c:\users\cglab\desktop\ray-tracing\rayprocess.h
+	"KDTree.h"
 	"Object.h"
 	"IO.h"
 
@@ -87,8 +89,15 @@
 	"Object.h"
 	<stdio.h>
 
-1523261060 source:c:\users\cglab\desktop\ray-tracing\rayprocess.cpp
+1525440332 source:c:\users\cglab\desktop\ray-tracing\rayprocess.cpp
 	"RayProcess.h"
 	<algorithm>
 	<math.h>
+
+1525489095 source:c:\users\cglab\desktop\ray-tracing\kdtree.cpp
+	"KDTree.h"
+
+1525436329 c:\users\cglab\desktop\ray-tracing\kdtree.h
+	<algorithm>
+	"Object.h"
 

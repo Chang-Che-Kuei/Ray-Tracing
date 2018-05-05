@@ -2,6 +2,7 @@
 #include"Object.h"
 #include"IO.h"
 #include"RayProcess.h"
+#include"KDTree.h"
 #include<time.h>
 int main(){
     time_t s =clock();
@@ -9,13 +10,20 @@ int main(){
     Info detail;
     char fileName[20] = "input.txt";
     ReadFile(detail,fileName);
-   // printf("%f %d ss\n",detail.sph[0].p_mtr->r,detail.sph.size());
-    //PrintInfo(detail);
+
+    //build KD Tree
+printf("Triangle=%d\n",detail.tri.size());
+    KDTree *kdtree;
+    BBox rootBox;
+    vector<Triangle*> allTri;
+    InitTriAndBox(detail.tri,allTri,rootBox);//Initialize bbox
+    kdtree->Build(allTri,rootBox,0);//0 is depth, for debugging
+
     ColorImage image;
-	image.init(256, 256);
-    RayIntersection(detail,image);
+	image.init(detail.w, detail.h);
+    RayIntersection(detail,image,kdtree);
 
     time_t e =clock();
-    printf("running time %f",(e-s));
+    printf("running time %f",(float)((e-s)/CLOCKS_PER_SEC) );
     return 0;
 }

@@ -537,7 +537,7 @@ vec3 operator * (const vec3& v, mat4& a)
     return a.transpose() * v;
 }
 
-float operator * (const vec3& a, const vec3& b)
+float operator * (const vec3& a, const vec3& b)//dot
 {
     return (a.n[VX]*b.n[VX] + a.n[VY]*b.n[VY] + a.n[VZ]*b.n[VZ]);
 }

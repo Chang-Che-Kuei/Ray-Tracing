@@ -23,7 +23,7 @@ struct Light{
 
 struct Triangle
 {
-    vec3 origin,v1,v2;//vector 1,2
+    vec3 origin,p1,p2,v1,v2,n;//vector 1,2
     Material mtr;
 };
 
@@ -46,6 +46,5 @@ struct Info{
     vector<Sphere>  sph;
     vector<Light> lig;
 };
-
 
 #endif // OBJECT_H_INCLUDED
