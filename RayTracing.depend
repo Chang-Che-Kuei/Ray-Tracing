@@ -101,3 +101,59 @@
 	<algorithm>
 	"Object.h"
 
+1525496026 source:c:\users\jacob\desktop\ray-tracing\algebra3.cpp
+	<math.h>
+	"algebra3.h"
+	<ctype.h>
+
+1525496026 c:\users\jacob\desktop\ray-tracing\algebra3.h
+	<algorithm>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+
+1525502411 source:c:\users\jacob\desktop\ray-tracing\io.cpp
+	"IO.h"
+	<stdio.h>
+
+1525496026 c:\users\jacob\desktop\ray-tracing\io.h
+	"Object.h"
+	<stdio.h>
+	<stdlib.h>
+	<assert.h>
+
+1525502411 c:\users\jacob\desktop\ray-tracing\object.h
+	"algebra3.h"
+	<vector>
+	<iostream>
+
+1525502411 source:c:\users\jacob\desktop\ray-tracing\kdtree.cpp
+	"KDTree.h"
+
+1525506741 c:\users\jacob\desktop\ray-tracing\kdtree.h
+	<algorithm>
+	"Object.h"
+
+1525502411 source:c:\users\jacob\desktop\ray-tracing\main.cpp
+	"algebra3.h"
+	"Object.h"
+	"IO.h"
+	"RayProcess.h"
+	"KDTree.h"
+	<time.h>
+
+1525502411 c:\users\jacob\desktop\ray-tracing\rayprocess.h
+	"KDTree.h"
+	"Object.h"
+	"IO.h"
+
+1525496026 source:c:\users\jacob\desktop\ray-tracing\object.cpp
+	"algebra3.h"
+	"Object.h"
+	<stdio.h>
+
+1525506548 source:c:\users\jacob\desktop\ray-tracing\rayprocess.cpp
+	"RayProcess.h"
+	<algorithm>
+	<math.h>
+

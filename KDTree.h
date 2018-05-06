@@ -9,6 +9,8 @@ struct BBox//bounding box
 {
     vec3 minimum = vec3(INT_MAX,INT_MAX,INT_MAX),
          maximum = vec3(INT_MIN,INT_MIN,INT_MIN); //box extent
+
+    bool IntersectWithRay(vec3 &point,vec3 &rayVec);
 };
 
 class KDTree
@@ -20,6 +22,8 @@ private:
 
 public:
     KDTree* Build(vector<Triangle*>&tri,BBox bbox,int depth);
+    void IntersectWithTriangle(KDTree* node,vec3 &point,vec3 &rayVec,
+                       float &t,Triangle **nearestTri);
 };
 
 int FindLongestAxis(vec3& midPoint);

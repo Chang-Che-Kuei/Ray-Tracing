@@ -33,6 +33,8 @@
 		</Compiler>
 		<Unit filename="IO.cpp" />
 		<Unit filename="IO.h" />
+		<Unit filename="KDTree.cpp" />
+		<Unit filename="KDTree.h" />
 		<Unit filename="Object.cpp" />
 		<Unit filename="Object.h" />
 		<Unit filename="RayProcess.cpp" />

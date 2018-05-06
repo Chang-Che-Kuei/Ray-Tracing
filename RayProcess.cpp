@@ -52,25 +52,9 @@ Triangle* IntersectWithTriangle(vec3 &point,vec3 &rayVec,Info &detail,float &t,K
     Triangle * ret = NULL;
 
     //KD Tree, find the box
-
-    for(unsigned int r=0; r<detail.tri.size(); ++r)
-    {
-        /*
-        Triangle: (x,y,z)= origin + s1*v1 +s2*v2
-        Ray:      (x,y,z)= eye + t(xd,yd,zd), (xd,yd,zd) = digit-eye = rayVec
-               -->s1*v1 + s2*v2 - t*(digit-eye) = eye-origin
-
-        s1*v1.x + s2*v2.x - t*(digit-eye).x = (eye-origin).x
-        s1*v1.y + s2*v2.y - t*(digit-eye).y = (eye-origin).y
-        s1*v1.z + s2*v2.z - t*(digit-eye).z = (eye-origin).z
-        Want to know s1,s2 and t
-
-        Solve it with Gauss-Jordan elimination
-        [v1.x v2.x (digit-eye).x]   [s1]   [ (eye-origin).x]
-        [v2.y v2.y (digit-eye).y] * [s2] = [ (eye-origin).y]
-        [v2.z v2.z (digit-eye).z]   [t ]   [ (eye-origin).z]*/
-
-        Triangle now = detail.tri[r];
+    //kdtree->RayBoxIntersection(kdtree,point,rayVec,t,ret);
+    /*
+    Triangle now = detail.tri[r];
         vec3 rightSystem = point - now.origin;
         vec3 v1 = now.v1, v2 = now.v2, v3 = -rayVec;
         mat3 m = mat3(vec3(v1[0],v2[0],v3[0]),
@@ -87,7 +71,8 @@ Triangle* IntersectWithTriangle(vec3 &point,vec3 &rayVec,Info &detail,float &t,K
                 t = ans[2];
                 ret = &detail.tri[r];
             }
-    }
+    */
+
     return ret;
 }
 void PhongShading(Material* m,vector<Light> &light,vec3 surface,vec3 N,vec3 surfaceToEye,

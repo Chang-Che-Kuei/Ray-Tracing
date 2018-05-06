@@ -32,16 +32,18 @@ int FindLongestAxis(vec3& midPoint)
 int times = 0,depth = 0;
 KDTree* KDTree::Build(vector<Triangle*>&tri,BBox bbox,int depth)
 {
-  //  printf("times=%d tri=%d\n",times++,tri.size());
+    //  printf("times=%d tri=%d\n",times++,tri.size());
     KDTree *node = new KDTree();
     node->kdTri = tri;
     node->box = bbox;
 
-    if(tri.size()==0)return node;
+    if(tri.size()==0)
+        return node;
 
     //find longest axis
     vec3 axisLen = vec3();//0 0 0
-    for(int i=0;i<3;++i)axisLen[i] = bbox.maximum[i] - bbox.minimum[i];
+    for(int i=0; i<3; ++i)
+        axisLen[i] = bbox.maximum[i] - bbox.minimum[i];
     int axis = FindLongestAxis(axisLen);
 
     //split triangles at center based on longest axis
@@ -55,8 +57,10 @@ KDTree* KDTree::Build(vector<Triangle*>&tri,BBox bbox,int depth)
         float M = max(tri[i]->origin[axis],tri[i]->p1[axis]);
         M = max(M,tri[i]->p2[axis]);
         //printf("i=%d m=%f M=%f split=%f\n",i,m,M,split);
-        if(m<=split)left_tri.push_back(tri[i]);
-        if(M>=split)right_tri.push_back(tri[i]);
+        if(m<=split)
+            left_tri.push_back(tri[i]);
+        if(M>=split)
+            right_tri.push_back(tri[i]);
     }
 //printf("left =%d right=%d split=%f %d\n",left_tri.size(),right_tri.size(),split,axis);
 
@@ -69,7 +73,8 @@ KDTree* KDTree::Build(vector<Triangle*>&tri,BBox bbox,int depth)
 //printf("left\n");
         node->left = Build(left_tri,bLeft,depth+1);
     }
-    else node->left = new KDTree(),printf("leaf left=%4d %4d\n",left_tri.size(),depth);
+    else
+        node->left = new KDTree(),printf("leaf left=%4d %4d\n",left_tri.size(),depth);
 
     if(right_tri.size()>MaxTriInNode&&left_tri.size()!=right_tri.size())
     {
@@ -79,6 +84,48 @@ KDTree* KDTree::Build(vector<Triangle*>&tri,BBox bbox,int depth)
 //printf("right\n");
         node->right = Build(right_tri,bRight,depth+1);
     }
-    else node->right = new KDTree(),printf("leaf rigt=%4d %4d\n",right_tri.size(),depth);
+    else
+        node->right = new KDTree(),printf("leaf rigt=%4d %4d\n",right_tri.size(),depth);
     return node;
+}
+
+void KDTree::IntersectWithTriangle(KDTree* node,vec3 &point,vec3 &rayVec,
+                                   float &t,Triangle **nearestTri)
+{// !! don't need argument KDTree* node.
+    if(box.IntersectWithRay(point,rayVec))
+    {
+        bool hisTri = false;
+        bool hasTri = false;
+        if(node->left->kdTri.size() > 0)
+            hasTri=true,IntersectWithTriangle(node->left,point,rayVec,
+                                       t,nearestTri);
+        if(node->right->kdTri.size() > 0)
+            hasTri=true,IntersectWithTriangle(node->right,point,rayVec,
+                                       t,nearestTri);
+        if(hasTri)
+        {
+            for(unsigned int i=0;i<kdTri.size();++i)
+            {
+
+            }
+        }
+    }
+}
+
+
+//struct BBox function
+//Ray - Box Intersection, "slabs" algorithm -- Kay and Kayjia
+bool BBox::IntersectWithRay(vec3 &point,vec3 &rayVec)
+{
+    double tmin = INT_MIN, tmax = INT_MAX;
+    for(int dimen=0; dimen<3; dimen++)
+        if (rayVec[dimen] != 0 )  //x
+        {
+            double t1 = ( minimum[dimen] - point[dimen] ) / rayVec[dimen];
+            double t2 = ( maximum[dimen] - point[dimen] ) / rayVec[dimen];
+
+            tmin = max(tmin, min(t1, t2));
+            tmax = min(tmax, max(t1, t2));
+        }
+    return tmax >= tmin;
 }
