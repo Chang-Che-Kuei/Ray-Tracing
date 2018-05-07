@@ -17,13 +17,13 @@ printf("Triangle=%d\n",detail.tri.size());
     BBox rootBox;
     vector<Triangle*> allTri;
     InitTriAndBox(detail.tri,allTri,rootBox);//Initialize bbox
-    kdtree->Build(allTri,rootBox,0);//0 is depth, for debugging
-
+    kdtree = kdtree->Build(allTri,rootBox,0);//0 is depth, for debugging
+printf("%d fsdf\n",kdtree->kdTri.size());
     ColorImage image;
 	image.init(detail.w, detail.h);
     RayIntersection(detail,image,kdtree);
 
     time_t e =clock();
-    printf("running time %f",(float)((e-s)/CLOCKS_PER_SEC) );
+    printf("running time %f",((float)(e-s)/(float)CLOCKS_PER_SEC) );
     return 0;
 }

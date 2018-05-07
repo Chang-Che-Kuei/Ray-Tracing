@@ -7,6 +7,9 @@ using namespace std;
 #define REFLECT_LIMIT 0.01
 
 #define ERROR 1e-6
+
+int ii=0,jj=0;
+
 void SetViewXY(vec3 &x,vec3 &y,vec3 dir)
 {
     //suppose the vision's x vector is vertical with z axis
@@ -47,34 +50,7 @@ Sphere* IntersectWithSphere(vec3 &point,vec3 &rayVec,Info &detail,float &t)
     return ret;
 }
 
-Triangle* IntersectWithTriangle(vec3 &point,vec3 &rayVec,Info &detail,float &t,KDTree *kdtree)
-{
-    Triangle * ret = NULL;
 
-    //KD Tree, find the box
-    //kdtree->RayBoxIntersection(kdtree,point,rayVec,t,ret);
-    /*
-    Triangle now = detail.tri[r];
-        vec3 rightSystem = point - now.origin;
-        vec3 v1 = now.v1, v2 = now.v2, v3 = -rayVec;
-        mat3 m = mat3(vec3(v1[0],v2[0],v3[0]),
-                      vec3(v1[1],v2[1],v3[1]),
-                      vec3(v1[2],v2[2],v3[2]));
-        //PrintVec3(now.v1);
-        //PrintVec3(now.v2);
-        //PrintVec3(-digit+eye);
-        vec3 ans = m.inverse(rightSystem);
-
-        if(ans[0]>0&&ans[1]>0 && ans[0]+ans[1]<=1 && ans[2]>0+ERROR)//0<s1,s2<1 , t>0
-            if(ans[2]<t)//ans[2] is t
-            {
-                t = ans[2];
-                ret = &detail.tri[r];
-            }
-    */
-
-    return ret;
-}
 void PhongShading(Material* m,vector<Light> &light,vec3 surface,vec3 N,vec3 surfaceToEye,
                   float reflectRate,Info &detail,Pixel *pix,KDTree* kdtree)
 {
@@ -89,10 +65,11 @@ void PhongShading(Material* m,vector<Light> &light,vec3 surface,vec3 N,vec3 surf
         //If there is any object blocks between surface and light -> black
         vec3 lightV = light[L].position - surface;
         lightV.normalize();
-        float t=9999,u=9999;
+        float t=INT_MAX,u=INT_MAX;
         Sphere * closestSphere = IntersectWithSphere(surface,lightV,detail,t);
         if(closestSphere)continue;//stop earlier when found an sphere obstacle
-        Triangle * closestTriangle = IntersectWithTriangle(surface,lightV,detail,u,kdtree);//if(closestTriangle)printf("TTasd\n");
+        Triangle * closestTriangle = nullptr;
+        kdtree->IntersectWithTriangle(kdtree,surface,lightV,u,&closestTriangle);//if(closestTriangle)printf("TTasd\n");
         if(closestTriangle)continue;
 
         //Diffuse, Id = kd*max(0, N dot L)*Ld
@@ -102,7 +79,7 @@ void PhongShading(Material* m,vector<Light> &light,vec3 surface,vec3 N,vec3 surf
         b += m->Kd*max(zero,N*lightV)*m->b*Ii;
 
         //Specular, Is = Ks*Ii(N dot H)^n
-        vec3 H = (lightV+surfaceToEye)/2;
+        vec3 H = (lightV+surfaceToEye)/(lightV+surfaceToEye).length();
         float dot_NH=N*H;
         float emphize = 50;
         r += m->Ks*max( zero,pow(dot_NH,m->exp) )*Ii*emphize;
@@ -113,6 +90,7 @@ void PhongShading(Material* m,vector<Light> &light,vec3 surface,vec3 N,vec3 surf
     pix->R = min(r,colorLimit);//pixel value should not exceed 255
     pix->G = min(g,colorLimit);
     pix->B = min(b,colorLimit);
+//printf("r=%d g=%d b=%d\n",pix->R,pix->G,pix->B);
 }
 
 void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
@@ -123,7 +101,8 @@ void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
         //determine whether rayVec intersects with spheres or triangles
         float t = INT_MAX,u = INT_MAX;
         Sphere * closestSphere = IntersectWithSphere(point,rayVec,detail,t);
-        Triangle * closestTriangle = IntersectWithTriangle(point,rayVec,detail,u,kdtree);
+        Triangle * closestTriangle = nullptr;
+        kdtree->IntersectWithTriangle(kdtree,point,rayVec,u,&closestTriangle);
 
         vec3 intersection , reflectVec;
         if( t!=INT_MAX&&t<u&&closestSphere )//t>0 implies that eye can see it
@@ -137,7 +116,7 @@ void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
             N.normalize();
             reflectVec = rayVec - 2*(rayVec*N)*N;
 
-            //PhongShading(material,light , intersection,N vector,surfaceToLaunchPoint,pixel)
+            //PhongShading(material,light , intersection,N vector,surfaceToLaunchPoint,pixel,kdtree)
             PhongShading(&closestSphere->mtr,detail.lig,
                          intersection, N,
                          point-intersection,reflectRate,detail,pix,kdtree);
@@ -153,8 +132,6 @@ void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
             vec3 N = closestTriangle->n;
             reflectVec = rayVec - 2*(rayVec*N)*N;
             if( N*(point-intersection)<=0)return;//N may be a vector not toward to eye
-
-            //PhongShading(material,light ,surface,N vector,surfaceToEye,pixel)
             PhongShading(&closestTriangle->mtr,detail.lig,
                          intersection, N,point-intersection,reflectRate,detail,pix,kdtree);
         }
@@ -175,7 +152,7 @@ void RayIntersection(Info &detail,ColorImage &image,KDTree *kdtree)
 
     for(int i=0; i<detail.h; ++i)
     {
-        printf("i=%d \n",i);
+printf("i=%d \n",i);
         for(int j=0; j<detail.w; ++j)
         {
             //printf("i=%d j=%d\n",i,j);
@@ -183,8 +160,13 @@ void RayIntersection(Info &detail,ColorImage &image,KDTree *kdtree)
             vec3 digit = start + viewX*j + viewY*i;
             vec3 rayVec = digit - eye;//with coefficient 't'
             RecursiveRayTracing(detail,&pix,eye,rayVec,1,kdtree);
+//if(i==0&&j==2)printf("i=%d j=%d \n",i,j),system("pause");
+//if(i==0&&j==3)printf("i=%d j=%d \n",i,j),system("pause");
             image.writePixel(j, i, pix);
+//if(j==2)printf("r=%d g=%d b=%d\n",pix.R,pix.G,pix.B);
+jj++;
         }
+ii++;
     }
     image.outputPPM("result.ppm");
 
