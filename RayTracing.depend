@@ -71,7 +71,7 @@
 	<vector>
 	<iostream>
 
-1525616636 source:c:\users\cglab\desktop\ray-tracing\main.cpp
+1526051958 source:c:\users\cglab\desktop\ray-tracing\main.cpp
 	"algebra3.h"
 	"Object.h"
 	"IO.h"
@@ -79,7 +79,7 @@
 	"KDTree.h"
 	<time.h>
 
-1525598079 c:\users\cglab\desktop\ray-tracing\rayprocess.h
+1526051340 c:\users\cglab\desktop\ray-tracing\rayprocess.h
 	"KDTree.h"
 	"Object.h"
 	"IO.h"
@@ -89,15 +89,15 @@
 	"Object.h"
 	<stdio.h>
 
-1525685770 source:c:\users\cglab\desktop\ray-tracing\rayprocess.cpp
+1526052586 source:c:\users\cglab\desktop\ray-tracing\rayprocess.cpp
 	"RayProcess.h"
 	<algorithm>
 	<math.h>
 
-1525685391 source:c:\users\cglab\desktop\ray-tracing\kdtree.cpp
+1526052661 source:c:\users\cglab\desktop\ray-tracing\kdtree.cpp
 	"KDTree.h"
 
-1525622731 c:\users\cglab\desktop\ray-tracing\kdtree.h
+1526050919 c:\users\cglab\desktop\ray-tracing\kdtree.h
 	<algorithm>
 	"Object.h"
 	"IO.h"

@@ -97,56 +97,22 @@ KDTree* KDTree::Build(vector<Triangle*>&tri,BBox &bbox,int depth)
     return node;
 }
 
-void KDTree::IntersectWithTriangle(KDTree* node,vec3 &point,vec3 &rayVec,
-                                   float &t,Triangle **nearestTri)
+
+
+void KDTree::FindIntersectionNodes(KDTree* node,vec3 &point,vec3 &rayVec,
+                                   float &t,vector<KDTree*>&nodes)
 {
     if(box.IntersectWithRay(point,rayVec))
     {
         bool leftChildExist = false, rightChildExist = false;
         if(left->kdTri.size() > 0)
-            leftChildExist=true,left->IntersectWithTriangle(left,point,rayVec,
-                           t,nearestTri);
+            leftChildExist=true,left->FindIntersectionNodes(left,point,rayVec,
+                           t,nodes);
         if(right->kdTri.size() > 0)
-            rightChildExist=true,right->IntersectWithTriangle(right,point,rayVec,
-                            t,nearestTri);
+            rightChildExist=true,right->FindIntersectionNodes(right,point,rayVec,
+                            t,nodes);
         if(leftChildExist==false&&rightChildExist==false)//reach leaf node
-
-            for(unsigned int i=0; i<kdTri.size(); ++i)//check ray-triangle intersection
-            {
-                /*
-                Triangle: (x,y,z)= origin + s1*v1 +s2*v2
-                Ray:      (x,y,z)= eye + t(xd,yd,zd), (xd,yd,zd) = digit-eye = rayVec
-                -->s1*v1 + s2*v2 - t*(digit-eye) = eye-origin
-
-                s1*v1.x + s2*v2.x - t*(digit-eye).x = (eye-origin).x
-                s1*v1.y + s2*v2.y - t*(digit-eye).y = (eye-origin).y
-                s1*v1.z + s2*v2.z - t*(digit-eye).z = (eye-origin).z
-                Want to know s1,s2 and t
-
-                Solve it with Gauss-Jordan elimination
-                [v1.x v2.x (digit-eye).x]   [s1]   [ (eye-origin).x]
-                [v2.y v2.y (digit-eye).y] * [s2] = [ (eye-origin).y]
-                [v2.z v2.z (digit-eye).z]   [t ]   [ (eye-origin).z]
-                */
-                Triangle now = *kdTri[i];
-                vec3 rightSystem = point - now.origin;
-                vec3 v1 = now.v1, v2 = now.v2, v3 = -rayVec;
-                mat3 m = mat3(vec3(v1[0],v2[0],v3[0]),
-                              vec3(v1[1],v2[1],v3[1]),
-                              vec3(v1[2],v2[2],v3[2]));
-
-                vec3 ans = m.inverse(rightSystem);
-
-                if(ans[0]>0&&ans[1]>0 && ans[0]+ans[1]<=1 && ans[2]>0+ERROR)//0<s1,s2<1 , t>0
-                    if(ans[2]<t)//ans[2] is t
-                    {
-                        t = ans[2];
-                        *nearestTri = kdTri[i];
-
-                    }
-            }
-
-
+            nodes.push_back(this);
     }
 }
 

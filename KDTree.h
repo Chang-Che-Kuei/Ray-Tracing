@@ -16,14 +16,20 @@ struct BBox//bounding box
 
 class KDTree
 {
-public:
+private:
     KDTree *left=nullptr,*right=nullptr;
-    vector<Triangle*> kdTri;
     BBox box;
 public:
+    vector<Triangle*> kdTri;
+    vec3 GetBoxCenter()
+    {
+        return vec3( (box.maximum[0]+box.minimum[0])/2,
+                    (box.maximum[1]+box.minimum[1])/2,
+                    (box.maximum[2]+box.minimum[2])/2 );
+    }
     KDTree* Build(vector<Triangle*>&tri,BBox &bbox,int depth);
-    void IntersectWithTriangle(KDTree* node,vec3 &point,vec3 &rayVec,
-                       float &t,Triangle **nearestTri);
+    void FindIntersectionNodes(KDTree* node,vec3 &point,vec3 &rayVec,
+                       float &t,vector<KDTree*>&nodes);
 };
 
 int FindLongestAxis(vec3& midPoint);

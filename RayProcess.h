@@ -15,4 +15,6 @@ void PhongShading(Material *m,vec3 lightV,vec3 surface,vec3 N,vec3 surfaceToEye,
 void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,float lastMtrReflect,KDTree* kdtree);
 void RayIntersection(Info &detail,ColorImage &image,KDTree *kdtree);
 
+bool IsIntersect(vec3 &point,vec3& rayVec,vector<KDTree*> &nodes);
+void FindClosetTri(vec3& point,vec3& rayVec,vector<KDTree*> &nodes,Triangle **nearestTri , float &t);
 #endif // RAYPROCESS_H_INCLUDED

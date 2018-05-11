@@ -50,6 +50,45 @@ Sphere* IntersectWithSphere(vec3 &point,vec3 &rayVec,Info &detail,float &t)
     return ret;
 }
 
+int tri=0;
+bool IsIntersect(vec3 &point,vec3& rayVec,vector<KDTree*> &nodes)
+{
+    for(unsigned int n=0;n<nodes.size();++n)
+        for(unsigned int i=0; i<nodes[n]->kdTri.size(); ++i)//check ray-triangle intersection
+            {
+//tri++;
+                /*
+                Triangle: (x,y,z)= origin + s1*v1 +s2*v2
+                Ray:      (x,y,z)= eye + t(xd,yd,zd), (xd,yd,zd) = digit-eye = rayVec
+                -->s1*v1 + s2*v2 - t*(digit-eye) = eye-origin
+
+                s1*v1.x + s2*v2.x - t*(digit-eye).x = (eye-origin).x
+                s1*v1.y + s2*v2.y - t*(digit-eye).y = (eye-origin).y
+                s1*v1.z + s2*v2.z - t*(digit-eye).z = (eye-origin).z
+                Want to know s1,s2 and t
+
+                Solve it with Gauss-Jordan elimination
+                [v1.x v2.x (digit-eye).x]   [s1]   [ (eye-origin).x]
+                [v2.y v2.y (digit-eye).y] * [s2] = [ (eye-origin).y]
+                [v2.z v2.z (digit-eye).z]   [t ]   [ (eye-origin).z]
+                */
+                Triangle now = *(nodes[n]->kdTri[i]);
+                vec3 rightSystem = point - now.origin;
+                vec3 v1 = now.v1, v2 = now.v2, v3 = -rayVec;
+                mat3 m = mat3(vec3(v1[0],v2[0],v3[0]),
+                              vec3(v1[1],v2[1],v3[1]),
+                              vec3(v1[2],v2[2],v3[2]));
+
+                vec3 ans = m.inverse(rightSystem);
+
+                if(ans[0]>0&&ans[1]>0 && ans[0]+ans[1]<=1 && ans[2]>0+ERROR)//0<s1,s2<1 , t>0
+                    {
+//printf("n=%d n all = %d\n",n,nodes.size());
+                        return true;
+                    }
+            }
+    return false;
+}
 
 void PhongShading(Material* m,vector<Light> &light,vec3 surface,vec3 N,vec3 surfaceToEye,
                   float reflectRate,Info &detail,Pixel *pix,KDTree* kdtree)
@@ -68,9 +107,9 @@ void PhongShading(Material* m,vector<Light> &light,vec3 surface,vec3 N,vec3 surf
         float t=INT_MAX,u=INT_MAX;
         Sphere * closestSphere = IntersectWithSphere(surface,lightV,detail,t);
         if(closestSphere)continue;//stop earlier when found an sphere obstacle
-        Triangle * closestTriangle = nullptr;
-        kdtree->IntersectWithTriangle(kdtree,surface,lightV,u,&closestTriangle);//if(closestTriangle)printf("TTasd\n");
-        if(closestTriangle)continue;
+        vector<KDTree*> nodes;
+        kdtree->FindIntersectionNodes(kdtree,surface,lightV,u,nodes);//if(closestTriangle)printf("TTasd\n");
+        if( IsIntersect(surface,lightV,nodes) )continue;
 
         //Diffuse, Id = kd*max(0, N dot L)*Ld
         //If N dot L< 0, then the point is on the dark side of the object.
@@ -93,6 +132,70 @@ void PhongShading(Material* m,vector<Light> &light,vec3 surface,vec3 N,vec3 surf
 //printf("r=%d g=%d b=%d\n",pix->R,pix->G,pix->B);
 }
 
+
+void FindClosetTri(vec3& point,vec3& rayVec,vector<KDTree*> &nodes,Triangle **nearestTri, float &t )
+{
+    vector<float>distanceBoxPoint;
+    for(unsigned int i=0;i<nodes.size();++i)//Get the distance between node and point
+    {
+        vec3 center = nodes[i]->GetBoxCenter();
+        center -= point;
+        distanceBoxPoint.push_back(center.length());
+    }
+
+    for(unsigned int i=0;i<nodes.size();++i)//sort the nodes by distanceBoxPoint
+        for(unsigned int j=0;j<nodes.size()-1;++j)
+            if(distanceBoxPoint[j]>distanceBoxPoint[j+1])
+            {
+                swap(distanceBoxPoint[j],distanceBoxPoint[j+1]);
+                swap(nodes[j],nodes[j+1]);
+            }
+
+    //find the triangle which intersects with rayVec
+    bool intersection = false;
+    for(unsigned int n=0;n<nodes.size()&&intersection==false;++n)
+        {
+            for(unsigned int i=0; i<nodes[n]->kdTri.size(); ++i)//check ray-triangle intersection
+            {
+//tri++;
+                /*
+                Triangle: (x,y,z)= origin + s1*v1 +s2*v2
+                Ray:      (x,y,z)= eye + t(xd,yd,zd), (xd,yd,zd) = digit-eye = rayVec
+                -->s1*v1 + s2*v2 - t*(digit-eye) = eye-origin
+
+                s1*v1.x + s2*v2.x - t*(digit-eye).x = (eye-origin).x
+                s1*v1.y + s2*v2.y - t*(digit-eye).y = (eye-origin).y
+                s1*v1.z + s2*v2.z - t*(digit-eye).z = (eye-origin).z
+                Want to know s1,s2 and t
+
+                Solve it with Gauss-Jordan elimination
+                [v1.x v2.x (digit-eye).x]   [s1]   [ (eye-origin).x]
+                [v2.y v2.y (digit-eye).y] * [s2] = [ (eye-origin).y]
+                [v2.z v2.z (digit-eye).z]   [t ]   [ (eye-origin).z]
+                */
+                Triangle now = *(nodes[n]->kdTri[i]);
+                vec3 rightSystem = point - now.origin;
+                vec3 v1 = now.v1, v2 = now.v2, v3 = -rayVec;
+                mat3 m = mat3(vec3(v1[0],v2[0],v3[0]),
+                              vec3(v1[1],v2[1],v3[1]),
+                              vec3(v1[2],v2[2],v3[2]));
+
+                vec3 ans = m.inverse(rightSystem);
+
+                if(ans[0]>0&&ans[1]>0 && ans[0]+ans[1]<=1 && ans[2]>0+ERROR)//0<s1,s2<1 , t>0
+                    if(ans[2]<t)//ans[2] is t
+                    {
+                        t = ans[2];
+                        *nearestTri = nodes[n]->kdTri[i];
+                        intersection = true;
+                    }
+            }
+//if(intersection==true)
+    //printf("n=%d n all = %d\n",n,nodes.size());
+        }
+
+}
+
 void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
                          float lastMtrReflect,KDTree *kdtree)
 {
@@ -102,7 +205,9 @@ void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
         float t = INT_MAX,u = INT_MAX;
         Sphere * closestSphere = IntersectWithSphere(point,rayVec,detail,t);
         Triangle * closestTriangle = nullptr;
-        kdtree->IntersectWithTriangle(kdtree,point,rayVec,u,&closestTriangle);
+        vector<KDTree*> nodes;
+        kdtree->FindIntersectionNodes(kdtree,point,rayVec,u,nodes);
+        FindClosetTri(point,rayVec,nodes,&closestTriangle,u);
 
         vec3 intersection , reflectVec;
         if( t!=INT_MAX&&t<u&&closestSphere )//t>0 implies that eye can see it
@@ -160,14 +265,10 @@ printf("i=%d \n",i);
             vec3 digit = start + viewX*j + viewY*i;
             vec3 rayVec = digit - eye;//with coefficient 't'
             RecursiveRayTracing(detail,&pix,eye,rayVec,1,kdtree);
-//if(i==0&&j==2)printf("i=%d j=%d \n",i,j),system("pause");
-//if(i==0&&j==3)printf("i=%d j=%d \n",i,j),system("pause");
             image.writePixel(j, i, pix);
-//if(j==2)printf("r=%d g=%d b=%d\n",pix.R,pix.G,pix.B);
-jj++;
         }
-ii++;
     }
+    printf("tri=%d\n",tri);
     image.outputPPM("result.ppm");
 
 }

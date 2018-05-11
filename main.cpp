@@ -5,7 +5,7 @@
 #include"KDTree.h"
 #include<time.h>
 int main(){
-    time_t s =clock();
+    time_t s = clock();
 
     Info detail;
     char fileName[20] = "input.txt";
@@ -18,7 +18,7 @@ printf("Triangle=%d\n",detail.tri.size());
     vector<Triangle*> allTri;
     InitTriAndBox(detail.tri,allTri,rootBox);//Initialize bbox
     kdtree = kdtree->Build(allTri,rootBox,0);//0 is depth, for debugging
-printf("%d fsdf\n",kdtree->kdTri.size());
+
     ColorImage image;
 	image.init(detail.w, detail.h);
     RayIntersection(detail,image,kdtree);
