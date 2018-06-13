@@ -31,17 +31,17 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="IO.cpp" />
-		<Unit filename="IO.h" />
-		<Unit filename="KDTree.cpp" />
-		<Unit filename="KDTree.h" />
-		<Unit filename="Object.cpp" />
-		<Unit filename="Object.h" />
-		<Unit filename="RayProcess.cpp" />
-		<Unit filename="RayProcess.h" />
-		<Unit filename="algebra3.cpp" />
-		<Unit filename="algebra3.h" />
-		<Unit filename="main.cpp" />
+		<Unit filename="src/IO.cpp" />
+		<Unit filename="src/IO.h" />
+		<Unit filename="src/KDTree.cpp" />
+		<Unit filename="src/KDTree.h" />
+		<Unit filename="src/Object.cpp" />
+		<Unit filename="src/Object.h" />
+		<Unit filename="src/RayProcess.cpp" />
+		<Unit filename="src/RayProcess.h" />
+		<Unit filename="src/algebra3.cpp" />
+		<Unit filename="src/algebra3.h" />
+		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
