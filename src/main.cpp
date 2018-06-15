@@ -8,7 +8,7 @@ int main(){
     time_t s = clock();
 
     Info detail;
-    char fileName[20] = "Input/input.txt";
+    char fileName[20] = "Input/sponza.obj";
     ReadFile(detail,fileName);
 
     //build KD Tree

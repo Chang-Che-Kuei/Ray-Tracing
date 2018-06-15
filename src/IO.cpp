@@ -1,16 +1,69 @@
 #include"IO.h"
 #include<stdio.h>
-
+#include<iostream>
+#include<sstream>
+#include<fstream>
+#include<string.h>
+using namespace std;
 void ReadFile(Info &detail,const char fileName[])
 {
-    FILE *fp =fopen(fileName,"r");
+    /*FILE *fp =fopen(fileName,"r");
     if(fp==NULL)
     {
         cout<<"Cannot find this file."<<endl;
         return ;
+    }*/
+    fstream file;      //宣告fstream物件
+    file.open(fileName, ios::in);
+    if(file.is_open()==false)
+    {
+        cout<<"No such input file\n";
+        return;
     }
 
-    char inputTarget;
+    vector<vec3> vertex,vn,vt;
+    string statement,fragment;
+    while(getline(file,statement))//v 1.0 1.0 2.0
+    {
+        istringstream buffer(statement);
+        getline(buffer,fragment,' ');
+        if(strcmp(fragment.c_str(),"v")==0)
+        {
+            vec3 temp;
+            int index=0;
+            while(getline(buffer,fragment,' '))
+                temp[index++]=stringtoDouble(fragment);
+            vertex.push_back(temp);
+        }
+        else if(strcmp(fragment,"vn")==0)
+        {
+            vec3 temp;
+            int index=0;
+            while(getline(buffer,fragment,' '))
+                temp[index++]=stringtoDouble(fragment);
+            vn.push_back(temp);
+        }
+        else if(strcmp(fragment,"vt")==0)
+        {
+            vec3 temp;
+            int index=0;
+            while(getline(buffer,fragment,' '))
+                temp[index++]=stringtoDouble(fragment);
+            vt.push_back(temp);
+        }
+
+        while(getline(buffer,fragment,' '))           //getline(delim[來源位置],token[存入位置],'　'[分割的條件])
+        {
+            cout<<fragment<<endl;
+            istringstream data(fragment);
+            string raw;
+            while(getline(data,raw,'/'))
+            {
+                //cout<<f<<endl;
+            }
+        }
+    }
+    /*
     while(fscanf(fp," %c",&inputTarget)!=EOF)
     {
         Material m;
@@ -73,8 +126,8 @@ void ReadFile(Info &detail,const char fileName[])
             break;
         }
         }
-    }
-    fclose(fp);
+    }*/
+    //fclose(fp);
 }
 
 ColorImage::ColorImage()
