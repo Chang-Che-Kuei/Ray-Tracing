@@ -4,6 +4,8 @@
 #include<sstream>
 #include<fstream>
 #include<string.h>
+#include<string>
+#include <stdlib.h>
 using namespace std;
 void ReadFile(Info &detail,const char fileName[])
 {
@@ -23,6 +25,7 @@ void ReadFile(Info &detail,const char fileName[])
 
     vector<vec3> vertex,vn,vt;
     string statement,fragment;
+    Material *mptr = nullptr;
     while(getline(file,statement))//v 1.0 1.0 2.0
     {
         istringstream buffer(statement);
@@ -32,24 +35,50 @@ void ReadFile(Info &detail,const char fileName[])
             vec3 temp;
             int index=0;
             while(getline(buffer,fragment,' '))
-                temp[index++]=stringtoDouble(fragment);
+                temp[index++]=strtof(fragment.c_str(),0);
             vertex.push_back(temp);
         }
-        else if(strcmp(fragment,"vn")==0)
+        /*else if(strcmp(fragment,"vn")==0)
         {
             vec3 temp;
             int index=0;
             while(getline(buffer,fragment,' '))
                 temp[index++]=stringtoDouble(fragment);
             vn.push_back(temp);
-        }
-        else if(strcmp(fragment,"vt")==0)
+        }*/
+        else if(strcmp(fragment.c_str(),"vt")==0)
         {
             vec3 temp;
             int index=0;
             while(getline(buffer,fragment,' '))
-                temp[index++]=stringtoDouble(fragment);
+                temp[index++]=strtof(fragment.c_str(),0);
             vt.push_back(temp);
+        }
+        else if(strcmp(fragment.c_str(),"usemtl")==0)//ex: usemtl sp_svod_kapitel
+        {
+            getline(buffer,fragment,' ');
+            for(int i=0; i<detail.mtl.size(); ++i)
+                if(detail.mtl[i].title==fragment)
+                {
+                    mptr = &detail.mtl[i];
+                    break;
+                }
+        }
+        else if(strcmp(fragment.c_str(),"f")==0)// ex: f 1/1/1 2/2/2 3/3/3
+        {
+            vector<Index> index;
+            while(getline(buffer,fragment,' '))// fragment=1/1/1
+            {
+                Index temp;
+                istringstream v_vt(statement);
+                string v,vt;
+                getline(v_vt,v,' ');
+                getline(v_vt,vt,' ');
+                temp.v = stoi(v);
+                temp.vt = stoi(vt);
+                index.push_back(temp);
+            }
+            MakeTriangle(detail,index,vertex,vt,mptr);
         }
 
         while(getline(buffer,fragment,' '))           //getline(delim[來源位置],token[存入位置],'　'[分割的條件])
@@ -130,6 +159,39 @@ void ReadFile(Info &detail,const char fileName[])
     //fclose(fp);
 }
 
+void ReadMTL(Info &detail,const string &mtlFileName)
+{
+
+}
+void MakeTriangle(Info &detail,vector<Index>&index,vector<vec3>&vertex,vector<vec3>& vt,Material *mptr)
+{
+    while(index.size()>=3)
+    {
+        vector<Index>temp;
+        for(int i=0; i<index.size(); i+=3)
+            if(i+3<index.size())
+            {
+                Triangle temp;
+                temp.origin = vertex[index[i].v];
+                temp.p1 = vertex[index[i+1].v];
+                temp.p2 = vertex[index[i+2].v];
+
+                temp.texture[0] = vt[index[i].vt];
+                temp.texture[1] = vt[index[i+1].vt];
+                temp.texture[2] = vt[index[i+2].vt];
+
+                temp.v1 = temp.p1 - temp.origin;
+                temp.v2 = temp.p2 - temp.origin;
+                temp.n  = vertex[3];//cross
+                temp.n.normalize();
+                t.mtr = mptr;
+
+                detail.tri.push_back(temp);
+            }
+    }
+
+}
+}
 ColorImage::ColorImage()
 {
     pPixel = 0;

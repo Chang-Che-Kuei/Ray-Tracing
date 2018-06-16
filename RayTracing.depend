@@ -216,3 +216,56 @@
 	"KDTree.h"
 	<time.h>
 
+1529066070 source:c:\users\cglab\desktop\ray-tracing\src\algebra3.cpp
+	<math.h>
+	"algebra3.h"
+	<ctype.h>
+
+1529066070 c:\users\cglab\desktop\ray-tracing\src\algebra3.h
+	<algorithm>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+
+1529066070 source:c:\users\cglab\desktop\ray-tracing\src\kdtree.cpp
+	"KDTree.h"
+
+1529066070 c:\users\cglab\desktop\ray-tracing\src\kdtree.h
+	<algorithm>
+	"Object.h"
+	"IO.h"
+
+1529109996 c:\users\cglab\desktop\ray-tracing\src\object.h
+	"algebra3.h"
+	<vector>
+	<iostream>
+
+1529077701 c:\users\cglab\desktop\ray-tracing\src\io.h
+	"Object.h"
+	<stdio.h>
+	<stdlib.h>
+	<assert.h>
+
+1529066070 source:c:\users\cglab\desktop\ray-tracing\src\main.cpp
+	"algebra3.h"
+	"Object.h"
+	"IO.h"
+	"RayProcess.h"
+	"KDTree.h"
+	<time.h>
+
+1529066070 c:\users\cglab\desktop\ray-tracing\src\rayprocess.h
+	"KDTree.h"
+	"Object.h"
+	"IO.h"
+
+1529066070 source:c:\users\cglab\desktop\ray-tracing\src\object.cpp
+	"algebra3.h"
+	"Object.h"
+	<stdio.h>
+
+1529066070 source:c:\users\cglab\desktop\ray-tracing\src\rayprocess.cpp
+	"RayProcess.h"
+	<algorithm>
+	<math.h>
+

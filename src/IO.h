@@ -7,6 +7,8 @@
 #include <assert.h>
 
 void ReadFile(Info &detail,const char fileName[]);
+void ReadMTL(Info &detail,const string &mtlFileName);
+void MakeTriangle(Info &detail,vector<Index>&index,vector<vec3>&vertex,vector<vec3>& vt,Material *mptr);
 void PrintInfo( Info detail);
 void PrintVec3(vec3 v);
 
