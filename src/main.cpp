@@ -8,10 +8,15 @@ int main(){
     time_t s = clock();
 
     Info detail;
-    char fileName[20] = "Input/sponza.obj";
+    detail.img.resize(100);//default give 100 image of space
+    char fileName[20] = "Input/test.obj";
     ReadFile(detail,fileName);
+for(unsigned int i=0;i<detail.img.size();++i)
+{
+    printf("%s\n",detail.img[i].title.c_str());
+    if(detail.img[i].img.empty())printf("!!\n");
+}
 
-    //build KD Tree
 printf("Triangle=%d\n",detail.tri.size());
     KDTree *kdtree;
     BBox rootBox;
@@ -26,4 +31,5 @@ printf("Triangle=%d\n",detail.tri.size());
     time_t e =clock();
     printf("running time %f",((float)(e-s)/(float)CLOCKS_PER_SEC) );
     return 0;
+
 }

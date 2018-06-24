@@ -2,7 +2,7 @@
 
 #include"KDTree.h"
 #define ERROR 1e-6
-#define MaxTriInNode 10
+#define MaxTriInNode 50
 enum Axis {X,Y,Z};//X=0 Y=1 Z=2
 
 void InitTriAndBox(vector<Triangle>&tri,vector<Triangle*>&all,BBox &box)
@@ -12,13 +12,13 @@ void InitTriAndBox(vector<Triangle>&tri,vector<Triangle*>&all,BBox &box)
         all.push_back(&tri[i]);
         for(int axis=0; axis<3; ++axis)
         {
-            box.minimum[axis] = min(box.minimum[axis],tri[i].origin[axis]);
-            box.minimum[axis] = min(box.minimum[axis],tri[i].p1[axis]);
-            box.minimum[axis] = min(box.minimum[axis],tri[i].p2[axis]);
+            box.minimum[axis] = min(box.minimum[axis],tri[i].p[0][axis]);
+            box.minimum[axis] = min(box.minimum[axis],tri[i].p[1][axis]);
+            box.minimum[axis] = min(box.minimum[axis],tri[i].p[2][axis]);
 
-            box.maximum[axis] = max(box.maximum[axis],tri[i].origin[axis]);
-            box.maximum[axis] = max(box.maximum[axis],tri[i].p1[axis]);
-            box.maximum[axis] = max(box.maximum[axis],tri[i].p2[axis]);
+            box.maximum[axis] = max(box.maximum[axis],tri[i].p[0][axis]);
+            box.maximum[axis] = max(box.maximum[axis],tri[i].p[1][axis]);
+            box.maximum[axis] = max(box.maximum[axis],tri[i].p[2][axis]);
         }
     }
 }
@@ -54,9 +54,9 @@ KDTree* KDTree::Build(vector<Triangle*>&tri,BBox &bbox,int depth)
     int same = 0;
     for(unsigned int i=0; i<tri.size(); ++i)
     {
-        float m = min(min(tri[i]->origin[axis],tri[i]->p1[axis]),tri[i]->p2[axis]);
-        float M = max(max(tri[i]->origin[axis],tri[i]->p1[axis]),tri[i]->p2[axis]);
-        M = max(M,tri[i]->p2[axis]);
+        float m = min(min(tri[i]->p[0][axis],tri[i]->p[1][axis]),tri[i]->p[2][axis]);
+        float M = max(max(tri[i]->p[0][axis],tri[i]->p[1][axis]),tri[i]->p[2][axis]);
+        M = max(M,tri[i]->p[2][axis]);
 
         if(m<=split)
             left_tri.push_back(tri[i]);

@@ -1,0 +1,23 @@
+E 0 0 -1
+V 0 0 1
+F 45
+R 256 256
+L 5 5 -5
+
+mtllib test.mtl
+
+v  -1 -1 5
+v  -1 1 5
+v  1 1 5
+v  1 -1 5
+
+vt 0 1 0
+vt 0 0 0
+vt 1 0 0
+vt 1 1 0
+
+usemtl one
+f 1/1 2/2 3/3 
+
+usemtl one
+f 1/1 3/3 4/4

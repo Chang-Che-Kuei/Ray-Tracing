@@ -4,13 +4,16 @@
 #include"algebra3.h"
 #include<vector>
 #include<iostream>
+#include<opencv2/opencv.hpp>
+using namespace cv;
 using namespace std;
 
 struct Material{
-    string title;
-    float Ns,Ni,d,Tr,Tf,illum;
-    vec3 Ka,Kd,Ks,Ke;
+    string title="";
+    float Ns,Ni,d,Tr,illum;
+    vec3 Tf,Ka,Kd,Ks,Ke;
     string map_Ka,map_Kd,map_d,map_bump;
+    Mat *imgKa,*imgKd;
     /* ex:
     Ns 10.0000
 	Ni 1.5000
@@ -37,8 +40,8 @@ struct Light{
 
 struct Triangle
 {
-    vec3 origin,p1,p2,v1,v2,n;//vector 1,2
-    vec3 texture1,texture2,texture3;
+    vec3 p[3],v[2],n;//vector 1,2
+    vec3 texture[3];
     Material *mtr;
 };
 
@@ -53,6 +56,12 @@ struct Plane{
     vec3 origin,v1,v2;
 };
 
+struct MatImage
+{
+    Mat img;
+    string title;
+};
+
 struct Info{
     vec3 eye,direction;
     float FOV=0;
@@ -61,6 +70,9 @@ struct Info{
     vector<Sphere>  sph;
     vector<Light> lig;
     vector<Material> mtl;
+
+    vector<MatImage>img;
+    int imgIndex=0;
 };
 
 #endif // OBJECT_H_INCLUDED

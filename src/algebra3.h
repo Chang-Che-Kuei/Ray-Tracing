@@ -355,7 +355,8 @@ vec3& operator [] ( int i);		    // indexing
 // special functions
 
 mat3 transpose(void);			    // transpose
-vec3 inverse(vec3 ans);			    // inverse
+vec3 inverse(vec3 ans);			    // not inverse
+mat3 Inverse(void);            //inverse
 mat3& apply(V_FCT_PTR fct);		    // apply a func. to each element
 void print( FILE *file, char *name );       // print matrix to a file
 void set(const vec3& v0, const vec3& v1, const vec3& v2);
