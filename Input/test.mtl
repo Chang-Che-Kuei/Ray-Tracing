@@ -9,9 +9,9 @@ newmtl one
 	Kd 0.5880 0.5880 0.5880
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka red.JPG
-	map_Kd red.JPG
-	map_d red.JPG
+	map_Ka ambition.jpg
+	map_Kd ambition.jpg
+	map_d landScape.jpg
 
 newmtl two
 	Ns 10.0000
@@ -24,6 +24,6 @@ newmtl two
 	Kd 0.5880 0.5880 0.5880
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka blue.JPG
-	map_Kd blue.JPG
-	map_d blue.JPG
+	map_Ka ambition.jpg
+	map_Kd ambition.jpg
+	map_d landScape.jpg

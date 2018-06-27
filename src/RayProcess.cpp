@@ -6,15 +6,16 @@ using namespace std;
 #define RECUR_LIMIT 1
 #define REFLECT_LIMIT 0.01
 
-#define ERROR 1e-6
+#define ERROR 1e-3
 
-
+int gloX=0,gloY=0;
 void SetViewXY(vec3 &x,vec3 &y,vec3 dir)
 {
     //suppose the vision's x vector is vertical with z axis
     x = vec3(dir[1],-dir[0],0);
     if(x[0]==0&&x[1]==0)x[0]=1;//prevent (0,0,0)
     y = dir^x;//outer product
+//PrintVec3(y);
     x.normalize(),y.normalize();
 }
 
@@ -22,8 +23,8 @@ void SetViewPlane(vec3 &viewX,vec3 &viewY,vec3 &start,Info &detail)
 {
     vec3 dVector = D_Eye2View*detail.direction.normalize();
     vec3 digitLength = dVector*tan(detail.FOV/2*M_PI/180)*2/detail.w;
-    viewX *= digitLength.length();
-    viewY *= digitLength.length();
+    viewX *= -digitLength.length();
+    viewY *= -digitLength.length();
     vec3 leftTop  = detail.eye + dVector - viewX*detail.w/2 - viewY*detail.h/2;//the leftmost up-most vertex
     start = leftTop + viewX/2 - viewY/2;//start from the 'center' of the digit(space), but not vertex(line)
 }
@@ -49,14 +50,14 @@ Sphere* IntersectWithSphere(vec3 &point,vec3 &rayVec,Info &detail,float &t)
     return ret;
 }
 
-void ConvertTo2D(Triangle* tri,vec3& surface,mat3 &M,mat3& Tri2D,vec2& surface2D)
+void ConvertTo2D(Triangle* tri,vec3& surface,Mat &M,Mat& Tri2D,vec2& surface2D)
 {
     /*
-            M     *    Tri3D     =     Tri2D
-        [ a b c ]   [ x1 x2 x3 ]   [ x1' x2' x3' ]
-        [ d e f ] * [ y1 y2 y3 ] = [ y1' y2' y3' ]
-        [ 1 1 1 ]   [ z1 z2 z3 ]   [  A   B   C  ]
-        where A = x1+y1+z1 , similar with  B and C
+        (x, y, z) -> (ax+by+cz, dx+ey+fz)
+            Tri3D   *     M    =    Tri2D
+        [ x1 y1 z1 ]   [ a d ]   [ x1' y1' ]
+        [ x2 y2 z2 ] * [ b e ] = [ x2' y2' ]
+        [ x3 y3 z3 ]   [ c f ]   [ x3' y3' ]
 
         Convert 3D triangle to 2D space and one of
         the vertex (x1',y1') is (0,0), the another
@@ -65,12 +66,11 @@ void ConvertTo2D(Triangle* tri,vec3& surface,mat3 &M,mat3& Tri2D,vec2& surface2D
         The third vertex can be get by using sine and
         cosine.
 
-        --> M = Tri2D * inverse(Tri3D)
     */
-    mat3 Tri3D =
-        mat3(vec3(tri->p[0][0],tri->p[1][0],tri->p[2][0]),
-             vec3(tri->p[0][1],tri->p[1][1],tri->p[2][1]),
-             vec3(tri->p[0][2],tri->p[1][2],tri->p[2][2]) );
+    Mat Tri3D(3,3,CV_32F);
+    for(int i=0;i<3;++i)
+        for(int j=0;j<3;++j)
+            Tri3D.at<float>(i,j)=tri->p[i][j];
 
     float L12 = (tri->p[0]-tri->p[1]).length();
     float L13 = (tri->p[0]-tri->p[2]).length();
@@ -80,24 +80,34 @@ void ConvertTo2D(Triangle* tri,vec3& surface,mat3 &M,mat3& Tri2D,vec2& surface2D
     float angle = acos(cosine);
     float p3X = L13*cos(angle),
           p3Y = L13*sin(angle);
+    //build Tri2D
+    Tri2D.at<float>(0,0)=0;
+    Tri2D.at<float>(1,0)=0;
 
-    Tri2D =mat3(vec3(0,L12,p3X),
-                vec3(0, 0, p3Y),
-                vec3(tri->p[0][0]+tri->p[0][1]+tri->p[0][2],
-                     tri->p[1][0]+tri->p[1][1]+tri->p[1][2],
-                     tri->p[2][0]+tri->p[2][1]+tri->p[2][2]) );
-    //M = Tri2D * inverse(Tri3D)
-    mat3 a,b,c;
-    mat3 InverseTri = Tri3D.Inverse();
-    M = Tri2D * InverseTri;
+    Tri2D.at<float>(0,1)=L12;
+    Tri2D.at<float>(1,1)=0;
+
+    Tri2D.at<float>(0,2)=p3X;
+    Tri2D.at<float>(1,2)=p3Y;
+
+    Tri2D.at<float>(0,2)=tri->p[0][0]+tri->p[0][1]+tri->p[0][2];
+    Tri2D.at<float>(1,2)=tri->p[1][0]+tri->p[1][1]+tri->p[1][2];
+    Tri2D.at<float>(2,2)=tri->p[2][0]+tri->p[2][1]+tri->p[2][2];
+
+    Mat inverse(3,3,CV_32F);
+    invert(Tri3D,inverse,CV_SVD  );
+    M = Tri2D * inverse;
+
 //printf("M %f %f %f\n",M[2][0],M[2][1],M[2][2]);
     //move 3D point "surface" to 2D point
     for(int row =0;row<2;++row)
-        surface2D[row]=M[row]*surface;
+        for(int i=0;i<3;++i)
+        surface2D[row]+=M.at<float>(row,i)*surface[i];
  //   cout<<"sur "<<surface2D[0]<<" "<<surface2D[1]<<endl;
+
 }
 
-void TriangleAffine(mat3& Tri2D,vec2 &surface2D,Triangle* tri)
+void TriangleAffine(Mat& Tri2D,vec2 &surface2D,Triangle* tri)
 {
     /*Affine Tri2D to texture triangle
         Affine   *     Tri2D    =   TextureTri
@@ -106,31 +116,43 @@ void TriangleAffine(mat3& Tri2D,vec2 &surface2D,Triangle* tri)
     [ 0  0  1  ]   [ 1  1  1  ]   [  1   1   1  ]
     T = TextureTri * inverse(Tri2D)
     */
-    for(int i=0;i<3;++i)Tri2D[2][i]=1;
-    mat3 inverseTri2D = Tri2D.Inverse();
-    mat3 textureTri = mat3(vec3(tri->texture[0][0],tri->texture[1][0],tri->texture[2][0]),
-                           vec3(tri->texture[0][1],tri->texture[1][1],tri->texture[2][1]),
-                           vec3(1,1,1) );
+    for(int i=0;i<3;++i)Tri2D.at<float>(2,i)=1;
+    Mat inverseTri2D = Mat(3,3,CV_32F);
+    invert(Tri2D,inverseTri2D,CV_SVD);
+//cout<<"AFF1\n";
+    Mat textureTri(3,3,CV_32F);
+    for(int i=0;i<2;++i)
+        for(int j=0;j<3;++j)
+            textureTri.at<float>(i,j) = tri->texture[j][i];
+    for(int i=0;i<3;++i)textureTri.at<float>(2,i) = 1;
+
 //printf("text %f %f \n",tri->texture[0][0],tri->texture[0][1]);
-    mat3 affine = textureTri * inverseTri2D;
+    Mat affine = textureTri * inverseTri2D;
     //change surface2D to the point after affine
     vec3 surfaceVec3 = vec3(surface2D[0],surface2D[1],1);
     vec3 surfaceAffine = vec3(0,0,0);
     for(int i=0;i<2;++i)
-        surfaceAffine[i] = affine[i]*surfaceVec3;
+        for(int j=0;j<3;++j)
+            surfaceAffine[i] += affine.at<float>(i,j)*surfaceVec3[j];
     surface2D[0]=surfaceAffine[0];
     surface2D[1]=surfaceAffine[1];
  //   cout<<"After Affine "<<surface2D[0]<<" "<<surface2D[1]<<endl;
+   /* for(int i=0;i<2;++i)
+        PrintVec3(Tri2D[i]);
+        for(int i=0;i<2;++i)
+        PrintVec3(textureTri[i]);*/
 }
 
 void GetTexturePoint(int &x,int& y,Material* m,vec2& surface2D)
 {
-    int rows = m->imgKa->rows;
-    int cols = m->imgKa->cols;
+//if(m->imgKd==nullptr)printf("?????\n");
+    int rows = m->imgKd->rows;
+    int cols = m->imgKd->cols;
     //printf("rows=%d cols=%d surf %f %f\n",
       //     rows,cols,surface2D[0],surface2D[1]);
-    x = surface2D[0] * cols;
-    y = surface2D[1] * rows;
+    x = surface2D[0] * cols ;
+    y = surface2D[1] * rows ;
+x=abs(x),y=abs(y);
 }
 
 bool IsIntersect(vec3 &point,vec3& rayVec,vector<KDTree*> &nodes)
@@ -180,7 +202,7 @@ void PhongShading(Triangle *tri,Material* m,vector<Light> &light,vec3 surface,ve
     float Ii = 1;//suppose light intensity
 
     //convert 3D triangle to 2D space
-    mat3 M,Tri2D;
+    Mat M(3,3,CV_32F),Tri2D(3,3,CV_32F);
     vec2 surface2D;
     ConvertTo2D(tri,surface,M,Tri2D,surface2D);
 
@@ -188,16 +210,24 @@ void PhongShading(Triangle *tri,Material* m,vector<Light> &light,vec3 surface,ve
     TriangleAffine(Tri2D,surface2D,tri);
     int x=0,y=0;
     GetTexturePoint(x,y,m,surface2D);
+    //cout<<surface2D[0]<<" "<<surface2D[1]<<endl;
     //cout<<x<<" "<<y<<endl;
+//if(gloX==101)cout<<x<<" "<<y<<endl;
+    //if(x>1024||y>1024)cout<<x<<" "<<y<<endl;
     for(unsigned int L=0; L<light.size(); ++L)
     {
-
         //Ambient, Ka*Ia
         //Mat imgKa = imread(m->map_Ka,CV_LOAD_IMAGE_UNCHANGED);
-        r += m->Ka[0]*m->imgKa->at<cv::Vec3b>(y,x)[2];//opencv B-G-R
-        g += m->Ka[1]*m->imgKa->at<cv::Vec3b>(y,x)[1];
-        b += m->Ka[2]*m->imgKa->at<cv::Vec3b>(y,x)[0];
-
+        if(m->imgKa!=NULL){
+        r += m->Ka[0]*m->imgKa->at<cv::Vec3b>(y,x)[2]*Ii;//opencv B-G-R
+        g += m->Ka[1]*m->imgKa->at<cv::Vec3b>(y,x)[1]*Ii;
+        b += m->Ka[2]*m->imgKa->at<cv::Vec3b>(y,x)[0]*Ii;
+        }
+        else{
+            r += m->Ka[0]*Ii;//opencv B-G-R
+            g += m->Ka[1]*Ii;
+            b += m->Ka[2]*Ii;
+        }
         //If there is any object blocks between surface and light -> black
         vec3 lightV = light[L].position - surface;
         lightV.normalize();
@@ -206,15 +236,18 @@ void PhongShading(Triangle *tri,Material* m,vector<Light> &light,vec3 surface,ve
         if(closestSphere)continue;//stop earlier when found an sphere obstacle
         vector<KDTree*> nodes;
         kdtree->FindIntersectionNodes(kdtree,surface,lightV,u,nodes);//if(closestTriangle)printf("TTasd\n");
-        if( IsIntersect(surface,lightV,nodes) )continue;
-
+        if( IsIntersect(surface,lightV,nodes) ){
+//printf("hide %d\n",gloX);
+                continue;
+        }
+//printf("%d %d\n",x,y);
         //Diffuse, Id = kd*abs(N dot L)*Ld
-        //If N dot L< 0, then the point is on the dark side of the object.
+        //If N dot L< 0, then the point is on the dark side of the object. -->but only find the closest triangle could prevent this problem
         //Mat imgKd = imread(m->map_Kd,CV_LOAD_IMAGE_UNCHANGED);
-        r += m->Kd[0]*abs(N*lightV)*m->imgKd->at<cv::Vec3b>(y,x)[0];
-        g += m->Kd[1]*abs(N*lightV)*m->imgKd->at<cv::Vec3b>(y,x)[1];
-        b += m->Kd[2]*abs(N*lightV)*m->imgKd->at<cv::Vec3b>(y,x)[2];
-
+        r += m->Kd[0]*abs(N*lightV)*m->imgKd->at<cv::Vec3b>(y,x)[2]*Ii;
+        g += m->Kd[1]*abs(N*lightV)*m->imgKd->at<cv::Vec3b>(y,x)[1]*Ii;
+        b += m->Kd[2]*abs(N*lightV)*m->imgKd->at<cv::Vec3b>(y,x)[0]*Ii;
+//if(gloX>49)printf("N*lightV=%f\n",N*lightV);
         //Specular, Is = Ks*Ii(N dot H)^n
         vec3 H = (lightV+surfaceToEye)/(lightV+surfaceToEye).length();
         float dot_NH=abs(N*H);
@@ -234,25 +267,10 @@ void PhongShading(Triangle *tri,Material* m,vector<Light> &light,vec3 surface,ve
 
 void FindClosetTri(vec3& point,vec3& rayVec,vector<KDTree*> &nodes,Triangle **nearestTri, float &t )
 {
-    vector<float>distanceBoxPoint;
-    for(unsigned int i=0;i<nodes.size();++i)//Get the distance between node and point
-    {
-        vec3 center = nodes[i]->GetBoxCenter();
-        center -= point;
-        distanceBoxPoint.push_back(center.length());
-    }
 
-    for(unsigned int i=0;i<nodes.size();++i)//sort the nodes by distanceBoxPoint
-        for(unsigned int j=0;j<nodes.size()-1;++j)
-            if(distanceBoxPoint[j]>distanceBoxPoint[j+1])
-            {
-                swap(distanceBoxPoint[j],distanceBoxPoint[j+1]);
-                swap(nodes[j],nodes[j+1]);
-            }
 
     //find the triangle which intersects with rayVec
-    bool intersection = false;
-    for(unsigned int n=0;n<nodes.size()&&intersection==false;++n)
+    for(unsigned int n=0;n<nodes.size();++n)
         {
             for(unsigned int i=0; i<nodes[n]->kdTri.size(); ++i)//check ray-triangle intersection
             {
@@ -286,7 +304,6 @@ void FindClosetTri(vec3& point,vec3& rayVec,vector<KDTree*> &nodes,Triangle **ne
                     {
                         t = ans[2];
                         *nearestTri = nodes[n]->kdTri[i];
-                        intersection = true;
                     }
             }
 //if(intersection==true)
@@ -305,10 +322,20 @@ void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
         Sphere * closestSphere = IntersectWithSphere(point,rayVec,detail,t);
         Triangle * closestTriangle = nullptr;
         vector<KDTree*> nodes;
+//printf("Root box\n");
+//PrintVec3(kdtree->box.maximum);
+//PrintVec3(kdtree->box.minimum);
         kdtree->FindIntersectionNodes(kdtree,point,rayVec,u,nodes);
         FindClosetTri(point,rayVec,nodes,&closestTriangle,u);
-
+//printf("has %d nodes\n",nodes.size());
+//if(closestTriangle!=nullptr)printf("has triangle\n");
         vec3 intersection , reflectVec;
+/*if(gloX>49)
+{
+    printf("X%d Y %d\n",gloX,gloY);
+    if(closestTriangle==nullptr)printf("no");
+    else printf("yes\n");
+}*/
        /* if( t!=INT_MAX&&t<u&&closestSphere )//t>0 implies that eye can see it
         {
             float reflectRate = pow(lastMtrReflect,iteration);
@@ -328,6 +355,7 @@ void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
 
         if( u!=INT_MAX&&closestTriangle)
         {
+//if(gloX>49)cout<<"ghere\n";
             float reflectRate = pow(lastMtrReflect,iteration);
             if(reflectRate<REFLECT_LIMIT)return;
             lastMtrReflect = closestTriangle->mtr->Ks[0];
@@ -335,7 +363,7 @@ void RecursiveRayTracing(Info &detail,Pixel *pix,vec3 point,vec3 rayVec,
             intersection = point + u*rayVec;
             vec3 N = closestTriangle->n;
             reflectVec = rayVec - 2*(rayVec*N)*N;
-            if( N*(point-intersection)<=0)return;//N may be a vector not toward to eye
+            //if( N*(point-intersection)<=0)return;//N may be a vector not toward to eye
             PhongShading(closestTriangle, closestTriangle->mtr,detail.lig,
                          intersection, N,point-intersection,reflectRate,detail,pix,kdtree);
         }
@@ -354,18 +382,20 @@ void RayIntersection(Info &detail,ColorImage &image,KDTree *kdtree)
     vec3 start;//start from left-up most digit , and calculate the digit vector of x and y
     SetViewPlane(viewX,viewY,start,detail);
 cout<<detail.h<<" "<<detail.w<<endl;
-    for(int i=0; i<detail.h; ++i)
+    for(int i=0; i<detail.h; ++i,++gloX)
     {
 printf("i=%d \n",i);
-        for(int j=0; j<detail.w; ++j)
+        for(int j=0; j<detail.w; ++j,++gloY)
         {
-           // printf("i=%d j=%d\n",i,j);
+            //printf("i=%d j=%d\n",i,j);
             Pixel  pix = {0,0,0};
             vec3 digit = start + viewX*j + viewY*i;
+//if(j%10==0)PrintVec3(digit);
             vec3 rayVec = digit - eye;//with coefficient 't'
             RecursiveRayTracing(detail,&pix,eye,rayVec,1,kdtree);
             image.writePixel(j, i, pix);
         }
+gloY=0;
     }
     image.outputPPM("result.ppm");
 

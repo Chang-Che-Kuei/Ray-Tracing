@@ -32,6 +32,7 @@ void ReadFile(Info &detail,const char fileName[])
     Material *mptr = nullptr;
     while(getline(file,statement))//v 1.0 1.0 2.0
     {
+
         //cout<<statement<<endl;
         istringstream buffer(statement);
         getline(buffer,fragment,' ');
@@ -39,9 +40,10 @@ void ReadFile(Info &detail,const char fileName[])
         {
             vec3 temp;
             int index=0;
-            getline(buffer,fragment,' ');//take off abundant ' '
+            //getline(buffer,fragment,' ');//take off abundant ' '
             while(getline(buffer,fragment,' '))
-                temp[index++]=strtof(fragment.c_str(),0);
+                if(fragment.length()!=0)
+                    temp[index++]=strtof(fragment.c_str(),0);
             vertex.push_back(temp);
         }
         else if(strcmp(fragment.c_str(),"vt")==0)
@@ -49,14 +51,16 @@ void ReadFile(Info &detail,const char fileName[])
             vec3 temp;
             int index=0;
             while(getline(buffer,fragment,' '))
-                temp[index++]=strtof(fragment.c_str(),0);
+                if(fragment.length()>0)
+                    temp[index++]=strtof(fragment.c_str(),0);
+
             vt.push_back(temp);
         }
         else if(strcmp(fragment.c_str(),"usemtl")==0)//ex: usemtl sp_svod_kapitel
         {
             bool found = false;
             getline(buffer,fragment,' ');
-            for(int i=0; i<detail.mtl.size(); ++i)
+            for(unsigned int i=0; i<detail.mtl.size(); ++i)
                 if(detail.mtl[i].title==fragment)
                 {
                     found =true;
@@ -66,13 +70,15 @@ void ReadFile(Info &detail,const char fileName[])
                     break;
                 }
             if(found==false)
-                printf("Not found\n");
+                printf("Not found %s\n",fragment.c_str());
         }
         else if(strcmp(fragment.c_str(),"f")==0)// ex: f 1/1/1 2/2/2 3/3/3
         {
             vector<Index> index;
             while(getline(buffer,fragment,' '))// fragment=1/1/1
             {
+                if(fragment.length()==0)continue;
+
                 Index temp;
                 istringstream v_vt(fragment);
                 string v,vt;
@@ -86,14 +92,13 @@ void ReadFile(Info &detail,const char fileName[])
         }
         else if(strcmp(fragment.c_str(),"mtllib")==0)
         {
-            getline(buffer,fragment,' ');
+            getline(buffer,fragment,' ');//cout<<fragment<<endl;
             ReadMTL(detail,fragment);
         }
         else if(strcmp(fragment.c_str(),"E")==0)
         {
             vec3 temp;
             int index=0;
-            getline(buffer,fragment,' ');//take off abundant ' '
             while(getline(buffer,fragment,' '))
                 temp[index++]=strtof(fragment.c_str(),0);
             detail.eye = temp;
@@ -108,11 +113,8 @@ void ReadFile(Info &detail,const char fileName[])
         }
         else if(strcmp(fragment.c_str(),"F")==0)
         {
-            float temp;
-            int index=0;
             getline(buffer,fragment,' ');
-            temp=strtof(fragment.c_str(),0);
-            detail.FOV = temp;
+            detail.FOV = strtof(fragment.c_str(),0);
         }
         else if(strcmp(fragment.c_str(),"R")==0)
         {
@@ -133,6 +135,7 @@ void ReadFile(Info &detail,const char fileName[])
             detail.lig.push_back(light) ;
         }
     }
+    printf("vertex size = %d  vt=%d\n",vertex.size(),vt.size());
     file.close();
 }
 
@@ -149,48 +152,57 @@ void ReadMTL(Info &detail,const string &mtlFileName)
     Material temp;
     while(fscanf(fp,"%s",input)!=EOF)
     {
+        //cout<<input<<endl;
         if(strcmp(input,"newmtl")==0)
         {
-            if(temp.title!="")//the last mtl
+            if(temp.title!="")//not the first mtl
             {
                 bool hasExist = false;
-                for(int i=0; i<detail.imgIndex; ++i)
-                    if(detail.img[i].title==temp.map_Ka)
-                    {
-                        hasExist = true;
-                        temp.imgKa = &detail.img[i].img;
-                        break;
-                    }
-                if(hasExist==false)
+                if(temp.map_Ka.length()>0)
                 {
-                    MatImage newImage;
-                    newImage.title = temp.map_Ka;
-                    newImage.img = imread(temp.map_Ka,CV_LOAD_IMAGE_UNCHANGED);
-                    //if(newImage.img.empty())printf("WOW\n\n");
-                    detail.img[detail.imgIndex] = newImage;
-                    temp.imgKa = &detail.img[detail.imgIndex++].img;
-                    if(temp.imgKa->empty())
-                        printf("impossible\n");
-                }//materail img
-
-                hasExist = false;
-                for(int i=0; i<detail.imgIndex; ++i)
-                    if(detail.img[i].title==temp.map_Kd)
+                    for(int i=0; i<detail.imgIndex; ++i)
+                        if(detail.img[i].title==temp.map_Ka)
+                        {
+                            hasExist = true;
+                            temp.imgKa = &detail.img[i].img;
+                            break;
+                        }
+                    if(hasExist==false)
                     {
-                        hasExist = true;
-                        temp.imgKd = &detail.img[i].img;
-                        break;
-                    }
-                if(hasExist==false)
-                {
-                    MatImage newImage;
-                    newImage.title = temp.map_Kd;
-                    newImage.img = imread(temp.map_Kd,CV_LOAD_IMAGE_UNCHANGED);
-                    detail.img[detail.imgIndex]=newImage;
-                    temp.imgKd = &detail.img[detail.imgIndex++].img;
-                    //cout<<temp.imgKd;
+                        MatImage newImage;
+                        newImage.title = temp.map_Ka;
+                        newImage.img = imread(temp.map_Ka,CV_LOAD_IMAGE_UNCHANGED);
+                        if(newImage.img.empty())
+                            printf("WOW %s\n\n",temp.map_Ka.c_str());
+                        detail.img[detail.imgIndex] = newImage;
+                        temp.imgKa = &detail.img[detail.imgIndex++].img;
+                        if(temp.imgKa->empty())
+                            printf("impossible\n");
+                    }//materail img
                 }
 
+                hasExist = false;
+                if(temp.map_Kd.length()>0)
+                {
+                    for(int i=0; i<detail.imgIndex; ++i)
+                        if(detail.img[i].title==temp.map_Kd)
+                        {
+                            hasExist = true;
+                            temp.imgKd = &detail.img[i].img;
+                            break;
+                        }
+                    if(hasExist==false)
+                    {
+                        MatImage newImage;
+                        newImage.title = temp.map_Kd;
+                        newImage.img = imread(temp.map_Kd,CV_LOAD_IMAGE_UNCHANGED);
+                //if(newImage.img.empty())printf("why empty\n");
+                        detail.img[detail.imgIndex]=newImage;
+                        temp.imgKd = &detail.img[detail.imgIndex].img;
+                        detail.imgIndex++;
+                        //cout<<detail.img[0].title<<endl;
+                    }
+                }
                 detail.mtl.push_back(temp);
             }
 
@@ -270,169 +282,58 @@ void ReadMTL(Info &detail,const string &mtlFileName)
     }
     //LAST ONE
     bool hasExist = false;
-    for(int i=0; i<detail.imgIndex; ++i)
-        if(detail.img[i].title==temp.map_Ka)
-        {
-            hasExist = true;
-            temp.imgKa = &detail.img[i].img;
-            break;
-        }
-    if(hasExist==false)
+    if(temp.map_Ka.length()>0)
     {
-        MatImage newImage;
-        newImage.title = temp.map_Ka;
-        newImage.img = imread(temp.map_Ka,CV_LOAD_IMAGE_UNCHANGED);
-        //if(newImage.img.empty())printf("WOW\n\n");
-        detail.img[detail.imgIndex] = newImage;
-        temp.imgKa = &detail.img[detail.imgIndex++].img;
-    }//materail img
+        for(int i=0; i<detail.imgIndex; ++i)
+            if(detail.img[i].title==temp.map_Ka)
+            {
+                hasExist = true;
+                temp.imgKa = &detail.img[i].img;
+                break;
+            }
+        if(hasExist==false)
+        {
+            MatImage newImage;
+            newImage.title = temp.map_Ka;
+            newImage.img = imread(temp.map_Ka,CV_LOAD_IMAGE_UNCHANGED);
 
+            if(newImage.img.empty())printf("WOW\n\n");
+            detail.img[detail.imgIndex] = newImage;
+            temp.imgKa = &detail.img[detail.imgIndex++].img;
+            if(temp.imgKa->empty())cout<<temp.map_Ka<<endl;
+        }//materail img
+    }
     hasExist = false;
-    for(int i=0; i<detail.img.size(); ++i)
-        if(detail.img[i].title==temp.map_Kd)
-        {
-            hasExist = true;
-            temp.imgKd = &detail.img[i].img;
-            break;
-        }
-    if(hasExist==false)
+    if(temp.map_Kd.length()>0)
     {
-        MatImage newImage;
-        newImage.title = temp.map_Kd;
-        newImage.img = imread(temp.map_Kd,CV_LOAD_IMAGE_UNCHANGED);
-        detail.img[detail.imgIndex] = newImage;
-        temp.imgKd = &detail.img[detail.imgIndex].img;
-        //cout<<temp.imgKd;
+        for(unsigned int i=0; i<detail.img.size()&&temp.map_Kd.length()>0; ++i)
+            if(detail.img[i].title==temp.map_Kd)
+            {
+                hasExist = true;
+                temp.imgKd = &detail.img[i].img;
+                break;
+            }
+        if(hasExist==false)
+        {
+            MatImage newImage;
+            newImage.title = temp.map_Kd;
+            newImage.img = imread(temp.map_Kd,CV_LOAD_IMAGE_UNCHANGED);
+            detail.img[detail.imgIndex] = newImage;
+            temp.imgKd = &detail.img[detail.imgIndex].img;
+            //cout<<temp.imgKd;
+        }
     }
-
     detail.mtl.push_back(temp);
-
+    //if(temp.imgKa->empty() )printf("impossib %s\n",
+     //                              temp.map_Ka.c_str());
     fclose(fp);
-    /*
-    fstream file;      //«Å§ifstreamª«¥ó
-    string completeURL = "input/" +mtlFileName;
-    file.open(completeURL, ios::in);
-    if(file.is_open()==false)
-    {
-        cout<<"No such material file\n";
-        return;
-    }
 
-    string statement,fragment;
-    Material temp;
-    while(getline(file,statement))//ex: newmtl leaf
-    {
-        cout<<statement<<endl;
-        istringstream buffer(statement);
-        getline(buffer,fragment,' ');cout<<"f"<<fragment<<"?"<<endl;
-        if(strcmp(fragment.c_str(),"newmtl")==0)
-        {printf("mtl size=%s\n",temp.map_Ka.c_str());
-            if(temp.title!="")//the last mtl
-                detail.mtl.push_back(temp);
-
-            getline(buffer,fragment,' ');//new mtl
-            temp.title = fragment;
-        }
-        else if(strcmp(fragment.c_str(),"Ns")==0)
-        {
-            getline(buffer,fragment,' ');
-            temp.Ns = strtof(fragment.c_str(),0);
-            cout<<temp.Ns<<endl;
-        }
-        else if(strcmp(fragment.c_str(),"Ni")==0)
-        {
-            getline(buffer,fragment,' ');
-            temp.Ni = strtof(fragment.c_str(),0);
-        }
-        else if(strcmp(fragment.c_str(),"d")==0)
-        {
-            getline(buffer,fragment,' ');
-            temp.d = strtof(fragment.c_str(),0);
-        }
-        else if(strcmp(fragment.c_str(),"Tr")==0)
-        {
-            getline(buffer,fragment,' ');
-            temp.Tr = strtof(fragment.c_str(),0);
-        }
-        else if(strcmp(fragment.c_str(),"Tf")==0)
-        {
-            for(int i=0; i<3; ++i)
-            {
-                getline(buffer,fragment,' ');
-                temp.Tf[i] = strtof(fragment.c_str(),0);
-            }
-        }
-        else if(strcmp(fragment.c_str(),"illum")==0)
-        {
-            getline(buffer,fragment,' ');
-            temp.illum = strtof(fragment.c_str(),0);
-        }
-        else if(strcmp(fragment.c_str(),"Ka")==0)
-        {
-            for(int i=0; i<3; ++i)
-            {
-                getline(buffer,fragment,' ');
-                temp.Ka[i] = strtof(fragment.c_str(),0);
-            }
-        }
-        else if(strcmp(fragment.c_str(),"Kd")==0)
-        {
-            for(int i=0; i<3; ++i)
-            {
-                getline(buffer,fragment,' ');
-                temp.Kd[i] = strtof(fragment.c_str(),0);
-            }
-        }
-        else if(strcmp(fragment.c_str(),"Ks")==0)
-        {
-            for(int i=0; i<3; ++i)
-            {
-                getline(buffer,fragment,' ');
-                temp.Ks[i] = strtof(fragment.c_str(),0);
-            }
-        }
-        else if(strcmp(fragment.c_str(),"Ke")==0)
-        {
-            for(int i=0; i<3; ++i)
-            {
-                getline(buffer,fragment,' ');
-                temp.Ke[i] = strtof(fragment.c_str(),0);
-            }
-        }
-        else if(strcmp(fragment.c_str(),"map_Ka")==0)
-        {
-            getline(buffer,fragment,' ');
-            string fullPath = "input/" + fragment;
-            cout<<"??"<<temp.map_Ka<<endl;
-            temp.map_Ka = fullPath;
-        }
-        else if(strcmp(fragment.c_str(),"map_Kd")==0)
-        {
-            getline(buffer,fragment,' ');
-            string fullPath = "input/" + fragment;
-            temp.map_Kd = fullPath;
-        }
-        else if(strcmp(fragment.c_str(),"map_d")==0)
-        {
-            getline(buffer,fragment,' ');
-            string fullPath = "input/" + fragment;
-            temp.map_d = fullPath;
-        }
-        else if(strcmp(fragment.c_str(),"map_bump")==0)
-        {
-            getline(buffer,fragment,' ');
-            string fullPath = "input/" + fragment;
-            temp.map_bump = fullPath;
-            cout<<temp.map_bump<<endl;
-        }
-    }
-    file.close();
-    */
 }
 void MakeTriangle(Info &detail,vector<Index>&index,vector<vec3>&vertex,vector<vec3>& vt,Material *mptr)
 {
     while(index.size()>=3)
     {
+//cout<<"size="<<index.size()<<endl;
         int i;
         vector<Index>temp;
         temp.push_back(index[0]);
@@ -449,18 +350,19 @@ void MakeTriangle(Info &detail,vector<Index>&index,vector<vec3>&vertex,vector<ve
             tri.n  = tri.v[0]^tri.v[1];//cross
             tri.n.normalize();
             tri.mtr = mptr;
-            cout<<tri.mtr->Ni<<endl;
-            if(tri.mtr->imgKa->empty()||tri.mtr->imgKd->empty())
-                printf("??????????\n\n\n");
+            //cout<<tri.mtr->Ni<<endl;
+            //if(tri.mtr->imgKa->empty()||tri.mtr->imgKd->empty())
+             //   printf("??????????\n\n\n");
 
             detail.tri.push_back(tri);
             //PrintTriangle(tri);
+           // if(tri.mtr->imgKd->empty())cout<<"no"<<endl;
             temp.push_back(index[i+2]);
         }
-        for(int left = i+1; left<index.size(); ++left)
+        for(unsigned int left = i+1; left<index.size(); ++left)
             temp.push_back(index[left]);
         index.clear();
-        for(int j=0; j<temp.size(); ++j)
+        for(unsigned int j=0; j<temp.size(); ++j)
             index.push_back(temp[j]);
     }
 

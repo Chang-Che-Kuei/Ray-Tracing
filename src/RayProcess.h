@@ -18,7 +18,7 @@ void RayIntersection(Info &detail,ColorImage &image,KDTree *kdtree);
 
 bool IsIntersect(vec3 &point,vec3& rayVec,vector<KDTree*> &nodes);
 void FindClosetTri(Triangle *tri,vec3& surface,vec3& point,vec3& rayVec,vector<KDTree*> &nodes,Triangle **nearestTri , float &t);
-void ConvertTo2D(Triangle* tri,mat3 &M,mat3& Tri2D,vec2& surface2D);
-void TriangleAffine(mat3& Tri2D,vec2 &surface2D,Triangle* tri);
+void ConvertTo2D(Triangle* tri,Mat &M,Mat& Tri2D,vec2& surface2D);
+void TriangleAffine(Mat& Tri2D,vec2 &surface2D,Triangle* tri);
 void GetTexturePoint(int &x,int& y,Material* m,vec2& surface2D);
 #endif // RAYPROCESS_H_INCLUDED

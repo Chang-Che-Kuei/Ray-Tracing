@@ -13,7 +13,7 @@ struct Material{
     float Ns,Ni,d,Tr,illum;
     vec3 Tf,Ka,Kd,Ks,Ke;
     string map_Ka,map_Kd,map_d,map_bump;
-    Mat *imgKa,*imgKd;
+    Mat *imgKa=NULL,*imgKd=NULL;
     /* ex:
     Ns 10.0000
 	Ni 1.5000

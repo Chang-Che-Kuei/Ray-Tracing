@@ -104,6 +104,7 @@ void KDTree::FindIntersectionNodes(KDTree* node,vec3 &point,vec3 &rayVec,
 {
     if(box.IntersectWithRay(point,rayVec))
     {
+        //PrintVec3(box.maximum),PrintVec3(box.minimum);cout<<endl;
         bool leftChildExist = false, rightChildExist = false;
         if(left->kdTri.size() > 0)
             leftChildExist=true,left->FindIntersectionNodes(left,point,rayVec,

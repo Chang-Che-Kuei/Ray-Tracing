@@ -1,176 +1,61 @@
 # depslib dependency file v1.0
-1521690005 source:c:\users\jacob\desktop\raytracing\algebra3.cpp
+1529826301 source:c:\users\jacob\desktop\ray-tracing\src\algebra3.cpp
 	<math.h>
 	"algebra3.h"
 	<ctype.h>
 
-1521685014 c:\users\jacob\desktop\raytracing\algebra3.h
+1529826301 c:\users\jacob\desktop\ray-tracing\src\algebra3.h
 	<algorithm>
 	<math.h>
 	<stdio.h>
 	<stdlib.h>
 
-1521617282 source:c:\users\jacob\desktop\raytracing\object.cpp
-	"algebra3.h"
-	"Object.h"
-	<stdio.h>
+1529978374 source:c:\users\jacob\desktop\ray-tracing\src\kdtree.cpp
+	"KDTree.h"
 
-1521682323 c:\users\jacob\desktop\raytracing\object.h
+1529978401 c:\users\jacob\desktop\ray-tracing\src\kdtree.h
+	<algorithm>
+	"Object.h"
+	"IO.h"
+
+1529915723 c:\users\jacob\desktop\ray-tracing\src\object.h
 	"algebra3.h"
 	<vector>
 	<iostream>
+	<opencv2/opencv.hpp>
 
-1521625352 source:c:\users\jacob\desktop\raytracing\main.cpp
-	"algebra3.h"
-	"Object.h"
-	"IO.h"
-	"RayProcess.h"
-
-1521630666 c:\users\jacob\desktop\raytracing\io.h
+1529826301 c:\users\jacob\desktop\ray-tracing\src\io.h
 	"Object.h"
 	<stdio.h>
 	<stdlib.h>
 	<assert.h>
 
-1521630666 source:c:\users\jacob\desktop\raytracing\io.cpp
-	"IO.h"
-	<stdio.h>
-
-1521625368 c:\users\jacob\desktop\raytracing\rayprocess.h
-	"Object.h"
-	"IO.h"
-
-1521689367 source:c:\users\jacob\desktop\raytracing\rayprocess.cpp
-	"RayProcess.h"
-	<algorithm>
-	<math.h>
-
-1524198487 source:c:\users\cglab\desktop\ray-tracing\algebra3.cpp
-	<math.h>
-	"algebra3.h"
-	<ctype.h>
-
-1521685016 c:\users\cglab\desktop\ray-tracing\algebra3.h
-	<algorithm>
-	<math.h>
-	<stdio.h>
-	<stdlib.h>
-
-1525270919 source:c:\users\cglab\desktop\ray-tracing\io.cpp
-	"IO.h"
-	<stdio.h>
-
-1521630666 c:\users\cglab\desktop\ray-tracing\io.h
-	"Object.h"
-	<stdio.h>
-	<stdlib.h>
-	<assert.h>
-
-1525270919 c:\users\cglab\desktop\ray-tracing\object.h
-	"algebra3.h"
-	<vector>
-	<iostream>
-
-1526051958 source:c:\users\cglab\desktop\ray-tracing\main.cpp
+1530092694 source:c:\users\jacob\desktop\ray-tracing\src\main.cpp
 	"algebra3.h"
 	"Object.h"
 	"IO.h"
 	"RayProcess.h"
 	"KDTree.h"
 	<time.h>
+	<limits>
 
-1526051340 c:\users\cglab\desktop\ray-tracing\rayprocess.h
+1529983192 c:\users\jacob\desktop\ray-tracing\src\rayprocess.h
 	"KDTree.h"
 	"Object.h"
 	"IO.h"
+	<opencv2/opencv.hpp>
 
-1521617282 source:c:\users\cglab\desktop\ray-tracing\object.cpp
+1528791996 source:c:\users\jacob\desktop\ray-tracing\src\object.cpp
 	"algebra3.h"
 	"Object.h"
 	<stdio.h>
 
-1526052586 source:c:\users\cglab\desktop\ray-tracing\rayprocess.cpp
+1530096334 source:c:\users\jacob\desktop\ray-tracing\src\rayprocess.cpp
 	"RayProcess.h"
 	<algorithm>
 	<math.h>
 
-1526052661 source:c:\users\cglab\desktop\ray-tracing\kdtree.cpp
-	"KDTree.h"
-
-1526050919 c:\users\cglab\desktop\ray-tracing\kdtree.h
-	<algorithm>
-	"Object.h"
-	"IO.h"
-
-1528791996 source:c:\users\jacob\desktop\ray-tracing\algebra3.cpp
-	<math.h>
-	"algebra3.h"
-	<ctype.h>
-
-1528791996 c:\users\jacob\desktop\ray-tracing\algebra3.h
-	<algorithm>
-	<math.h>
-	<stdio.h>
-	<stdlib.h>
-
-1528792560 source:c:\users\jacob\desktop\ray-tracing\io.cpp
-	"IO.h"
-	<stdio.h>
-
-1528791996 c:\users\jacob\desktop\ray-tracing\io.h
-	"Object.h"
-	<stdio.h>
-	<stdlib.h>
-	<assert.h>
-
-1528792560 c:\users\jacob\desktop\ray-tracing\object.h
-	"algebra3.h"
-	<vector>
-	<iostream>
-
-1528792560 source:c:\users\jacob\desktop\ray-tracing\kdtree.cpp
-	"KDTree.h"
-
-1528792560 c:\users\jacob\desktop\ray-tracing\kdtree.h
-	<algorithm>
-	"Object.h"
-	"IO.h"
-
-1528794007 source:c:\users\jacob\desktop\ray-tracing\main.cpp
-	"algebra3.h"
-	"Object.h"
-	"IO.h"
-	"RayProcess.h"
-	"KDTree.h"
-	<time.h>
-
-1528792560 c:\users\jacob\desktop\ray-tracing\rayprocess.h
-	"KDTree.h"
-	"Object.h"
-	"IO.h"
-
-1528791996 source:c:\users\jacob\desktop\ray-tracing\object.cpp
-	"algebra3.h"
-	"Object.h"
-	<stdio.h>
-
-1528792560 source:c:\users\jacob\desktop\ray-tracing\rayprocess.cpp
-	"RayProcess.h"
-	<algorithm>
-	<math.h>
-
-1529756255 source:c:\users\jacob\desktop\ray-tracing\src\algebra3.cpp
-	<math.h>
-	"algebra3.h"
-	<ctype.h>
-
-1529756323 c:\users\jacob\desktop\ray-tracing\src\algebra3.h
-	<algorithm>
-	<math.h>
-	<stdio.h>
-	<stdlib.h>
-
-1529399204 source:c:\users\jacob\desktop\ray-tracing\src\io.cpp
+1530087429 source:c:\users\jacob\desktop\ray-tracing\src\io.cpp
 	"IO.h"
 	<stdio.h>
 	<iostream>
@@ -180,101 +65,4 @@
 	<string>
 	<stdlib.h>
 	<opencv2/opencv.hpp>
-
-1529150849 c:\users\jacob\desktop\ray-tracing\src\io.h
-	"Object.h"
-	<stdio.h>
-	<stdlib.h>
-	<assert.h>
-
-1529398919 c:\users\jacob\desktop\ray-tracing\src\object.h
-	"algebra3.h"
-	<vector>
-	<iostream>
-	<opencv2/opencv.hpp>
-
-1529301072 source:c:\users\jacob\desktop\ray-tracing\src\kdtree.cpp
-	"KDTree.h"
-
-1528792560 c:\users\jacob\desktop\ray-tracing\src\kdtree.h
-	<algorithm>
-	"Object.h"
-	"IO.h"
-
-1528791996 source:c:\users\jacob\desktop\ray-tracing\src\object.cpp
-	"algebra3.h"
-	"Object.h"
-	<stdio.h>
-
-1529825854 source:c:\users\jacob\desktop\ray-tracing\src\rayprocess.cpp
-	"RayProcess.h"
-	<algorithm>
-	<math.h>
-
-1529763518 c:\users\jacob\desktop\ray-tracing\src\rayprocess.h
-	"KDTree.h"
-	"Object.h"
-	"IO.h"
-	<opencv2/opencv.hpp>
-
-1529757624 source:c:\users\jacob\desktop\ray-tracing\src\main.cpp
-	"algebra3.h"
-	"Object.h"
-	"IO.h"
-	"RayProcess.h"
-	"KDTree.h"
-	<time.h>
-
-1529066070 source:c:\users\cglab\desktop\ray-tracing\src\algebra3.cpp
-	<math.h>
-	"algebra3.h"
-	<ctype.h>
-
-1529066070 c:\users\cglab\desktop\ray-tracing\src\algebra3.h
-	<algorithm>
-	<math.h>
-	<stdio.h>
-	<stdlib.h>
-
-1529066070 source:c:\users\cglab\desktop\ray-tracing\src\kdtree.cpp
-	"KDTree.h"
-
-1529066070 c:\users\cglab\desktop\ray-tracing\src\kdtree.h
-	<algorithm>
-	"Object.h"
-	"IO.h"
-
-1529109996 c:\users\cglab\desktop\ray-tracing\src\object.h
-	"algebra3.h"
-	<vector>
-	<iostream>
-
-1529077701 c:\users\cglab\desktop\ray-tracing\src\io.h
-	"Object.h"
-	<stdio.h>
-	<stdlib.h>
-	<assert.h>
-
-1529066070 source:c:\users\cglab\desktop\ray-tracing\src\main.cpp
-	"algebra3.h"
-	"Object.h"
-	"IO.h"
-	"RayProcess.h"
-	"KDTree.h"
-	<time.h>
-
-1529066070 c:\users\cglab\desktop\ray-tracing\src\rayprocess.h
-	"KDTree.h"
-	"Object.h"
-	"IO.h"
-
-1529066070 source:c:\users\cglab\desktop\ray-tracing\src\object.cpp
-	"algebra3.h"
-	"Object.h"
-	<stdio.h>
-
-1529066070 source:c:\users\cglab\desktop\ray-tracing\src\rayprocess.cpp
-	"RayProcess.h"
-	<algorithm>
-	<math.h>
 

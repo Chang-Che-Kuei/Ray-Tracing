@@ -18,8 +18,9 @@ class KDTree
 {
 private:
     KDTree *left=nullptr,*right=nullptr;
-    BBox box;
+
 public:
+    BBox box;
     vector<Triangle*> kdTri;
     vec3 GetBoxCenter()
     {
