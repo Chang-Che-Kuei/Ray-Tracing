@@ -82,27 +82,24 @@ void ConvertTo2D(Triangle* tri,vec3& surface,Mat &M,Mat& Tri2D,vec2& surface2D)
           p3Y = L13*sin(angle);
     //build Tri2D
     Tri2D.at<float>(0,0)=0;
-    Tri2D.at<float>(1,0)=0;
+    Tri2D.at<float>(0,1)=0;
 
-    Tri2D.at<float>(0,1)=L12;
+    Tri2D.at<float>(1,0)=L12;
     Tri2D.at<float>(1,1)=0;
 
-    Tri2D.at<float>(0,2)=p3X;
-    Tri2D.at<float>(1,2)=p3Y;
-
-    Tri2D.at<float>(0,2)=tri->p[0][0]+tri->p[0][1]+tri->p[0][2];
-    Tri2D.at<float>(1,2)=tri->p[1][0]+tri->p[1][1]+tri->p[1][2];
-    Tri2D.at<float>(2,2)=tri->p[2][0]+tri->p[2][1]+tri->p[2][2];
+    Tri2D.at<float>(2,0)=p3X;
+    Tri2D.at<float>(2,1)=p3Y;
 
     Mat inverse(3,3,CV_32F);
     invert(Tri3D,inverse,CV_SVD  );
-    M = Tri2D * inverse;
+    M = inverse * Tri2D;
 
 //printf("M %f %f %f\n",M[2][0],M[2][1],M[2][2]);
     //move 3D point "surface" to 2D point
+    surface2D[0]=surface2D[1]=0;
     for(int row =0;row<2;++row)
         for(int i=0;i<3;++i)
-        surface2D[row]+=M.at<float>(row,i)*surface[i];
+        surface2D[row]+=M.at<float>(i,row)*surface[i];
  //   cout<<"sur "<<surface2D[0]<<" "<<surface2D[1]<<endl;
 
 }
@@ -110,15 +107,19 @@ void ConvertTo2D(Triangle* tri,vec3& surface,Mat &M,Mat& Tri2D,vec2& surface2D)
 void TriangleAffine(Mat& Tri2D,vec2 &surface2D,Triangle* tri)
 {
     /*Affine Tri2D to texture triangle
-        Affine   *     Tri2D    =   TextureTri
+        Affine   *    Tri3*3    =   TextureTri
     [ t1 t2 t3 ]   [ x1 x2 x3 ]   [ x1' x2' x3' ]
     [ t4 t5 t6 ] * [ y1 y2 y3 ] = [ y1' y2' y3' ]
     [ 0  0  1  ]   [ 1  1  1  ]   [  1   1   1  ]
-    T = TextureTri * inverse(Tri2D)
+    Affine = TextureTri * inverse(Tri33)
     */
-    for(int i=0;i<3;++i)Tri2D.at<float>(2,i)=1;
-    Mat inverseTri2D = Mat(3,3,CV_32F);
-    invert(Tri2D,inverseTri2D,CV_SVD);
+    Mat Tri33 = Mat(3,3,CV_32F);
+    for(int i=0;i<2;++i)
+        for(int j=0;j<3;++j)
+            Tri33.at<float>(i,j) = Tri2D.at<float>(j,i);
+    for(int i=0;i<3;++i)Tri33.at<float>(2,i)=1;
+    Mat inverseTri33 = Mat(3,3,CV_32F);
+    invert(Tri33,inverseTri33,CV_SVD);
 //cout<<"AFF1\n";
     Mat textureTri(3,3,CV_32F);
     for(int i=0;i<2;++i)
@@ -127,7 +128,14 @@ void TriangleAffine(Mat& Tri2D,vec2 &surface2D,Triangle* tri)
     for(int i=0;i<3;++i)textureTri.at<float>(2,i) = 1;
 
 //printf("text %f %f \n",tri->texture[0][0],tri->texture[0][1]);
-    Mat affine = textureTri * inverseTri2D;
+    Mat affine = textureTri * inverseTri33;
+/*if(gloX%10==0){printf("Affine %d %d\n",gloX,gloY);
+for(int i=0;i<3;++i)
+{
+    for(int j=0;j<3;++j)
+     printf("%f ",affine.at<float>(i,j));
+    printf("\n");
+}}*/
     //change surface2D to the point after affine
     vec3 surfaceVec3 = vec3(surface2D[0],surface2D[1],1);
     vec3 surfaceAffine = vec3(0,0,0);
@@ -136,7 +144,8 @@ void TriangleAffine(Mat& Tri2D,vec2 &surface2D,Triangle* tri)
             surfaceAffine[i] += affine.at<float>(i,j)*surfaceVec3[j];
     surface2D[0]=surfaceAffine[0];
     surface2D[1]=surfaceAffine[1];
- //   cout<<"After Affine "<<surface2D[0]<<" "<<surface2D[1]<<endl;
+    if(surface2D[0]<0||surface2D[1]<0)
+  cout<<"After Affine "<<surface2D[0]<<" "<<surface2D[1]<<endl;
    /* for(int i=0;i<2;++i)
         PrintVec3(Tri2D[i]);
         for(int i=0;i<2;++i)
@@ -199,10 +208,10 @@ void PhongShading(Triangle *tri,Material* m,vector<Light> &light,vec3 surface,ve
 {
     N.normalize(),surfaceToEye.normalize();
     float r=0,g=0,b=0,colorLimit=255;
-    float Ii = 1;//suppose light intensity
+    float Ii = 1.6;//suppose light intensity
 
     //convert 3D triangle to 2D space
-    Mat M(3,3,CV_32F),Tri2D(3,3,CV_32F);
+    Mat M(3,2,CV_32F),Tri2D(3,2,CV_32F);
     vec2 surface2D;
     ConvertTo2D(tri,surface,M,Tri2D,surface2D);
 

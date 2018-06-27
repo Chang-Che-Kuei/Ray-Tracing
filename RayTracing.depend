@@ -50,7 +50,7 @@
 	"Object.h"
 	<stdio.h>
 
-1530096334 source:c:\users\jacob\desktop\ray-tracing\src\rayprocess.cpp
+1530106038 source:c:\users\jacob\desktop\ray-tracing\src\rayprocess.cpp
 	"RayProcess.h"
 	<algorithm>
 	<math.h>
