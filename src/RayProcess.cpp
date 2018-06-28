@@ -144,8 +144,8 @@ for(int i=0;i<3;++i)
             surfaceAffine[i] += affine.at<float>(i,j)*surfaceVec3[j];
     surface2D[0]=surfaceAffine[0];
     surface2D[1]=surfaceAffine[1];
-    if(surface2D[0]<0||surface2D[1]<0)
-  cout<<"After Affine "<<surface2D[0]<<" "<<surface2D[1]<<endl;
+//if(surface2D[0]<0||surface2D[1]<0)
+ // cout<<"After Affine "<<surface2D[0]<<" "<<surface2D[1]<<endl;
    /* for(int i=0;i<2;++i)
         PrintVec3(Tri2D[i]);
         for(int i=0;i<2;++i)
