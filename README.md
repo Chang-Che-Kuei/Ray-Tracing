@@ -21,6 +21,9 @@ With the benefit of loading these two file, texture mapping can be done.
 Be carefull! In this project, there are still bugs in the texture mapping.  
 <img src="Picture/Ambition.jpg" width="200" >  
 Mapping an image to a plane is flawless.   
-Wolmyeongdong,Daejeong City,Korea   
+Wolmyeongdong,Daejeong City,Korea 
+
 <img src="Picture/banana.jpg" width="200" >  
+Banana  
 <img src="Picture/sofa.jpg" width="200" >  
+Sofa  
