@@ -19,11 +19,11 @@ The above is on the branch of Home
 The following is on the branch of HomeHome  
 With the benefit of loading these two file, texture mapping can be done.  
 Be carefull! In this project, there are still bugs in the texture mapping.  
-<img src="Picture/Ambition.jpg" width="200" >  
+<img src="Picture/Ambition.jpg" width="400" >  
 Mapping an image to a plane is flawless.   
 Wolmyeongdong,Daejeong City,Korea 
 
-<img src="Picture/banana.jpg" width="200" >  
+<img src="Picture/banana.jpg" width="400" >  
 Banana  
-<img src="Picture/sofa.jpg" width="200" >  
+<img src="Picture/sofa.jpg" width="400" >  
 Sofa  
